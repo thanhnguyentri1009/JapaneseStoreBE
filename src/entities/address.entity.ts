@@ -1,4 +1,12 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Customer } from './customer.entity';
 import { Order } from './order.entity';
 
@@ -7,7 +15,9 @@ export class Address {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Customer, (customer) => customer.addresses, { nullable: true })
+  @ManyToOne(() => Customer, (customer) => customer.addresses, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
