@@ -8,6 +8,7 @@ import { Address } from '../entities/address.entity';
 import { Order, OrderStatus } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
 import { Payment, PaymentMethod, PaymentStatus } from '../entities/payment.entity';
+import { Role } from '../entities/role.entity';
 
 async function seed() {
   await AppDataSource.initialize();
@@ -16,6 +17,14 @@ async function seed() {
   // Clear existing data
   await AppDataSource.query('TRUNCATE TABLE payments, order_items, orders, addresses, customers, product_colors, products, categories RESTART IDENTITY CASCADE');
   console.log('Cleared existing data');
+
+  // ===== ROLES =====
+  const roleRepo = AppDataSource.getRepository(Role);
+  for (const name of ['user', 'admin']) {
+    const exists = await roleRepo.findOne({ where: { name } });
+    if (!exists) await roleRepo.save(roleRepo.create({ name }));
+  }
+  console.log('Seeded roles');
 
   // ===== CATEGORIES =====
   const categoryRepo = AppDataSource.getRepository(Category);

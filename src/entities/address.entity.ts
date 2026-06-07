@@ -1,19 +1,29 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Customer } from './customer.entity';
 import { Order } from './order.entity';
 
 @Entity('addresses')
 export class Address {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @ManyToOne(() => Customer, (customer) => customer.addresses, { nullable: true })
+  @ManyToOne(() => Customer, (customer) => customer.addresses, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
   @Index()
-  @Column({ name: 'customer_id', nullable: true })
-  customerId: number;
+  @Column({ name: 'customer_id', nullable: true, type: 'uuid' })
+  customerId: string;
 
   @Column({ type: 'text' })
   address: string;

@@ -1,18 +1,25 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Product } from './product.entity';
 
 @Entity('product_colors')
 export class ProductColor {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Product, (product) => product.colors, { nullable: true })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
   @Index()
-  @Column({ name: 'product_id', nullable: true })
-  productId: number;
+  @Column({ name: 'product_id', nullable: true, type: 'uuid' })
+  productId: string;
 
   @Column({ name: 'color_code', length: 20, nullable: true })
   colorCode: string;

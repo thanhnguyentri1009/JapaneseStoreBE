@@ -1,12 +1,38 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+
+import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
+import { ProductColorModule } from './modules/product-color/product-color.module';
+import { CustomerModule } from './modules/customer/customer.module';
+import { AddressModule } from './modules/address/address.module';
+import { OrderModule } from './modules/order/order.module';
+import { OrderItemModule } from './modules/order-item/order-item.module';
+import { PaymentModule } from './modules/payment/payment.module';
+import { AccountModule } from './modules/account/account.module';
+import { RoleModule } from './modules/role/role.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: process.env.REDIS_HOST ?? 'localhost',
+            port: parseInt(process.env.REDIS_PORT ?? '6379'),
+          },
+          ttl: 60 * 1000, // 60 giây (milliseconds)
+        }),
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,8 +48,18 @@ import { AppService } from './app.service';
         logging: config.get('NODE_ENV') === 'development',
       }),
     }),
+    CategoryModule,
+    ProductModule,
+    ProductColorModule,
+    CustomerModule,
+    AddressModule,
+    OrderModule,
+    OrderItemModule,
+    PaymentModule,
+    AccountModule,
+    RoleModule,
+    JwtModule.register({}),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}
