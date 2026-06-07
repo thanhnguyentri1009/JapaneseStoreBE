@@ -25,7 +25,8 @@ export class PaymentService implements IPaymentService {
 
   async findByOrderId(orderId: string): Promise<Payment> {
     const entity = await this.repo.findOne({ where: { orderId } });
-    if (!entity) throw new NotFoundException(`Payment for Order #${orderId} not found`);
+    if (!entity)
+      throw new NotFoundException(`Payment for Order #${orderId} not found`);
     return entity;
   }
 

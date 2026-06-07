@@ -1,5 +1,17 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Inject } from '@nestjs/common';
-import { CUSTOMER_SERVICE, ICustomerService } from './interfaces/customer-service.interface';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Inject,
+} from '@nestjs/common';
+import {
+  CUSTOMER_SERVICE,
+  ICustomerService,
+} from './interfaces/customer-service.interface';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';

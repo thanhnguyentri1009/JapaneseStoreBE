@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from './role.entity';
 
 @Entity('accounts')
@@ -15,7 +21,10 @@ export class Account {
   @Column()
   password: string;
 
-  @ManyToOne(() => Role, (role) => role.accounts, { eager: true, nullable: true })
+  @ManyToOne(() => Role, (role) => role.accounts, {
+    eager: true,
+    nullable: true,
+  })
   @JoinColumn({ name: 'role_id' })
   role: Role;
 

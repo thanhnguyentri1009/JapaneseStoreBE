@@ -7,7 +7,11 @@ import { Customer } from '../entities/customer.entity';
 import { Address } from '../entities/address.entity';
 import { Order, OrderStatus } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
-import { Payment, PaymentMethod, PaymentStatus } from '../entities/payment.entity';
+import {
+  Payment,
+  PaymentMethod,
+  PaymentStatus,
+} from '../entities/payment.entity';
 import { Role } from '../entities/role.entity';
 
 async function seed() {
@@ -15,7 +19,9 @@ async function seed() {
   console.log('Connected to database');
 
   // Clear existing data
-  await AppDataSource.query('TRUNCATE TABLE payments, order_items, orders, addresses, customers, product_colors, products, categories RESTART IDENTITY CASCADE');
+  await AppDataSource.query(
+    'TRUNCATE TABLE payments, order_items, orders, addresses, customers, product_colors, products, categories RESTART IDENTITY CASCADE',
+  );
   console.log('Cleared existing data');
 
   // ===== ROLES =====
@@ -29,8 +35,15 @@ async function seed() {
   // ===== CATEGORIES =====
   const categoryRepo = AppDataSource.getRepository(Category);
   const [alcoholCat, waterCat] = await categoryRepo.save([
-    { name: 'Alcohol Markers', description: 'Bút marker gốc cồn, màu sắc tươi sáng, phù hợp vẽ chuyên nghiệp' },
-    { name: 'Water-based Markers', description: 'Bút marker gốc nước, an toàn, phù hợp mọi lứa tuổi' },
+    {
+      name: 'Alcohol Markers',
+      description:
+        'Bút marker gốc cồn, màu sắc tươi sáng, phù hợp vẽ chuyên nghiệp',
+    },
+    {
+      name: 'Water-based Markers',
+      description: 'Bút marker gốc nước, an toàn, phù hợp mọi lứa tuổi',
+    },
   ]);
   console.log('Seeded categories');
 
@@ -124,51 +137,208 @@ async function seed() {
   const colorRepo = AppDataSource.getRepository(ProductColor);
   const kaala24 = products[5];
   await colorRepo.save([
-    { product: kaala24, colorCode: 'R01', colorName: 'Crimson Red', hexValue: '#DC143C' },
-    { product: kaala24, colorCode: 'R05', colorName: 'Coral', hexValue: '#FF6B6B' },
-    { product: kaala24, colorCode: 'O01', colorName: 'Orange', hexValue: '#FFA500' },
-    { product: kaala24, colorCode: 'Y01', colorName: 'Lemon Yellow', hexValue: '#FFF44F' },
-    { product: kaala24, colorCode: 'Y05', colorName: 'Golden Yellow', hexValue: '#FFD700' },
-    { product: kaala24, colorCode: 'G01', colorName: 'Lime Green', hexValue: '#32CD32' },
-    { product: kaala24, colorCode: 'G05', colorName: 'Forest Green', hexValue: '#228B22' },
-    { product: kaala24, colorCode: 'BG1', colorName: 'Sky Blue', hexValue: '#87CEEB' },
-    { product: kaala24, colorCode: 'B01', colorName: 'Royal Blue', hexValue: '#4169E1' },
-    { product: kaala24, colorCode: 'B05', colorName: 'Navy Blue', hexValue: '#000080' },
-    { product: kaala24, colorCode: 'V01', colorName: 'Lavender', hexValue: '#E6E6FA' },
-    { product: kaala24, colorCode: 'V05', colorName: 'Purple', hexValue: '#800080' },
-    { product: kaala24, colorCode: 'P01', colorName: 'Pink', hexValue: '#FFC0CB' },
-    { product: kaala24, colorCode: 'BR1', colorName: 'Light Brown', hexValue: '#C4A265' },
-    { product: kaala24, colorCode: 'BR3', colorName: 'Dark Brown', hexValue: '#5C3317' },
-    { product: kaala24, colorCode: 'GR1', colorName: 'Light Gray', hexValue: '#D3D3D3' },
-    { product: kaala24, colorCode: 'GR3', colorName: 'Dark Gray', hexValue: '#696969' },
-    { product: kaala24, colorCode: 'BK1', colorName: 'Black', hexValue: '#000000' },
-    { product: kaala24, colorCode: 'W01', colorName: 'White', hexValue: '#FFFFFF' },
-    { product: kaala24, colorCode: 'SK1', colorName: 'Skin', hexValue: '#FFCBA4' },
-    { product: kaala24, colorCode: 'SK3', colorName: 'Tan', hexValue: '#D2B48C' },
-    { product: kaala24, colorCode: 'T01', colorName: 'Teal', hexValue: '#008080' },
-    { product: kaala24, colorCode: 'M01', colorName: 'Magenta', hexValue: '#FF00FF' },
-    { product: kaala24, colorCode: 'C01', colorName: 'Cyan', hexValue: '#00FFFF' },
+    {
+      product: kaala24,
+      colorCode: 'R01',
+      colorName: 'Crimson Red',
+      hexValue: '#DC143C',
+    },
+    {
+      product: kaala24,
+      colorCode: 'R05',
+      colorName: 'Coral',
+      hexValue: '#FF6B6B',
+    },
+    {
+      product: kaala24,
+      colorCode: 'O01',
+      colorName: 'Orange',
+      hexValue: '#FFA500',
+    },
+    {
+      product: kaala24,
+      colorCode: 'Y01',
+      colorName: 'Lemon Yellow',
+      hexValue: '#FFF44F',
+    },
+    {
+      product: kaala24,
+      colorCode: 'Y05',
+      colorName: 'Golden Yellow',
+      hexValue: '#FFD700',
+    },
+    {
+      product: kaala24,
+      colorCode: 'G01',
+      colorName: 'Lime Green',
+      hexValue: '#32CD32',
+    },
+    {
+      product: kaala24,
+      colorCode: 'G05',
+      colorName: 'Forest Green',
+      hexValue: '#228B22',
+    },
+    {
+      product: kaala24,
+      colorCode: 'BG1',
+      colorName: 'Sky Blue',
+      hexValue: '#87CEEB',
+    },
+    {
+      product: kaala24,
+      colorCode: 'B01',
+      colorName: 'Royal Blue',
+      hexValue: '#4169E1',
+    },
+    {
+      product: kaala24,
+      colorCode: 'B05',
+      colorName: 'Navy Blue',
+      hexValue: '#000080',
+    },
+    {
+      product: kaala24,
+      colorCode: 'V01',
+      colorName: 'Lavender',
+      hexValue: '#E6E6FA',
+    },
+    {
+      product: kaala24,
+      colorCode: 'V05',
+      colorName: 'Purple',
+      hexValue: '#800080',
+    },
+    {
+      product: kaala24,
+      colorCode: 'P01',
+      colorName: 'Pink',
+      hexValue: '#FFC0CB',
+    },
+    {
+      product: kaala24,
+      colorCode: 'BR1',
+      colorName: 'Light Brown',
+      hexValue: '#C4A265',
+    },
+    {
+      product: kaala24,
+      colorCode: 'BR3',
+      colorName: 'Dark Brown',
+      hexValue: '#5C3317',
+    },
+    {
+      product: kaala24,
+      colorCode: 'GR1',
+      colorName: 'Light Gray',
+      hexValue: '#D3D3D3',
+    },
+    {
+      product: kaala24,
+      colorCode: 'GR3',
+      colorName: 'Dark Gray',
+      hexValue: '#696969',
+    },
+    {
+      product: kaala24,
+      colorCode: 'BK1',
+      colorName: 'Black',
+      hexValue: '#000000',
+    },
+    {
+      product: kaala24,
+      colorCode: 'W01',
+      colorName: 'White',
+      hexValue: '#FFFFFF',
+    },
+    {
+      product: kaala24,
+      colorCode: 'SK1',
+      colorName: 'Skin',
+      hexValue: '#FFCBA4',
+    },
+    {
+      product: kaala24,
+      colorCode: 'SK3',
+      colorName: 'Tan',
+      hexValue: '#D2B48C',
+    },
+    {
+      product: kaala24,
+      colorCode: 'T01',
+      colorName: 'Teal',
+      hexValue: '#008080',
+    },
+    {
+      product: kaala24,
+      colorCode: 'M01',
+      colorName: 'Magenta',
+      hexValue: '#FF00FF',
+    },
+    {
+      product: kaala24,
+      colorCode: 'C01',
+      colorName: 'Cyan',
+      hexValue: '#00FFFF',
+    },
   ]);
   console.log('Seeded product colors');
 
   // ===== CUSTOMERS =====
   const customerRepo = AppDataSource.getRepository(Customer);
   const customers = await customerRepo.save([
-    { name: 'Nguyễn Văn An', email: 'an.nguyen@gmail.com', phone: '0901234567' },
-    { name: 'Trần Thị Bình', email: 'binh.tran@gmail.com', phone: '0912345678' },
+    {
+      name: 'Nguyễn Văn An',
+      email: 'an.nguyen@gmail.com',
+      phone: '0901234567',
+    },
+    {
+      name: 'Trần Thị Bình',
+      email: 'binh.tran@gmail.com',
+      phone: '0912345678',
+    },
     { name: 'Lê Minh Châu', email: 'chau.le@gmail.com', phone: '0923456789' },
-    { name: 'Phạm Thu Dung', email: 'dung.pham@gmail.com', phone: '0934567890' },
+    {
+      name: 'Phạm Thu Dung',
+      email: 'dung.pham@gmail.com',
+      phone: '0934567890',
+    },
   ]);
   console.log('Seeded customers');
 
   // ===== ADDRESSES =====
   const addressRepo = AppDataSource.getRepository(Address);
   const addresses = await addressRepo.save([
-    { customer: customers[0], address: '123 Nguyễn Huệ, Phường Bến Nghé', city: 'Hồ Chí Minh', isDefault: true },
-    { customer: customers[0], address: '45 Lê Lợi, Phường Bến Thành', city: 'Hồ Chí Minh', isDefault: false },
-    { customer: customers[1], address: '78 Hoàn Kiếm, Phường Hàng Trống', city: 'Hà Nội', isDefault: true },
-    { customer: customers[2], address: '12 Trần Phú, Phường Hải Châu', city: 'Đà Nẵng', isDefault: true },
-    { customer: customers[3], address: '56 Hai Bà Trưng, Phường Tân Định', city: 'Hồ Chí Minh', isDefault: true },
+    {
+      customer: customers[0],
+      address: '123 Nguyễn Huệ, Phường Bến Nghé',
+      city: 'Hồ Chí Minh',
+      isDefault: true,
+    },
+    {
+      customer: customers[0],
+      address: '45 Lê Lợi, Phường Bến Thành',
+      city: 'Hồ Chí Minh',
+      isDefault: false,
+    },
+    {
+      customer: customers[1],
+      address: '78 Hoàn Kiếm, Phường Hàng Trống',
+      city: 'Hà Nội',
+      isDefault: true,
+    },
+    {
+      customer: customers[2],
+      address: '12 Trần Phú, Phường Hải Châu',
+      city: 'Đà Nẵng',
+      isDefault: true,
+    },
+    {
+      customer: customers[3],
+      address: '56 Hai Bà Trưng, Phường Tân Định',
+      city: 'Hồ Chí Minh',
+      isDefault: true,
+    },
   ]);
   console.log('Seeded addresses');
 

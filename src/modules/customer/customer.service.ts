@@ -66,7 +66,8 @@ export class CustomerService implements ICustomerService {
     }
 
     const entity = await this.repo.findOne({ where: { email } });
-    if (!entity) throw new NotFoundException(`Customer with email "${email}" not found`);
+    if (!entity)
+      throw new NotFoundException(`Customer with email "${email}" not found`);
 
     try {
       await this.cache.set(`customer:email:${email}`, entity);

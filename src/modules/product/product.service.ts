@@ -45,7 +45,10 @@ export class ProductService implements IProductService {
       this.logger.error(`Cache get failed for product:${id}`, error);
     }
 
-    const entity = await this.repo.findOne({ where: { id }, relations: ['category', 'colors'] });
+    const entity = await this.repo.findOne({
+      where: { id },
+      relations: ['category', 'colors'],
+    });
     if (!entity) throw new NotFoundException(`Product #${id} not found`);
 
     try {
@@ -59,18 +62,29 @@ export class ProductService implements IProductService {
 
   async findByCategoryId(categoryId: string): Promise<Product[]> {
     try {
-      const cached = await this.cache.get<Product[]>(`products:category:${categoryId}`);
+      const cached = await this.cache.get<Product[]>(
+        `products:category:${categoryId}`,
+      );
       if (cached) return cached;
     } catch (error) {
-      this.logger.error(`Cache get failed for products:category:${categoryId}`, error);
+      this.logger.error(
+        `Cache get failed for products:category:${categoryId}`,
+        error,
+      );
     }
 
-    const data = await this.repo.find({ where: { categoryId }, relations: ['colors'] });
+    const data = await this.repo.find({
+      where: { categoryId },
+      relations: ['colors'],
+    });
 
     try {
       await this.cache.set(`products:category:${categoryId}`, data);
     } catch (error) {
-      this.logger.error(`Cache set failed for products:category:${categoryId}`, error);
+      this.logger.error(
+        `Cache set failed for products:category:${categoryId}`,
+        error,
+      );
     }
 
     return data;
@@ -80,7 +94,8 @@ export class ProductService implements IProductService {
     const result = await this.repo.save(this.repo.create(dto));
     try {
       await this.cache.del('products');
-      if (dto.categoryId) await this.cache.del(`products:category:${dto.categoryId}`);
+      if (dto.categoryId)
+        await this.cache.del(`products:category:${dto.categoryId}`);
     } catch (error) {
       this.logger.error('Cache del failed after product create', error);
     }
@@ -93,7 +108,8 @@ export class ProductService implements IProductService {
     try {
       await this.cache.del('products');
       await this.cache.del(`product:${id}`);
-      if (entity.categoryId) await this.cache.del(`products:category:${entity.categoryId}`);
+      if (entity.categoryId)
+        await this.cache.del(`products:category:${entity.categoryId}`);
       if (dto.categoryId && dto.categoryId !== entity.categoryId) {
         await this.cache.del(`products:category:${dto.categoryId}`);
       }
@@ -109,7 +125,8 @@ export class ProductService implements IProductService {
     try {
       await this.cache.del('products');
       await this.cache.del(`product:${id}`);
-      if (entity.categoryId) await this.cache.del(`products:category:${entity.categoryId}`);
+      if (entity.categoryId)
+        await this.cache.del(`products:category:${entity.categoryId}`);
     } catch (error) {
       this.logger.error(`Cache del failed after product:${id} remove`, error);
     }

@@ -1,4 +1,11 @@
-import { IsDateString, IsEnum, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { PaymentMethod, PaymentStatus } from '../../../entities/payment.entity';
 
 export class CreatePaymentDto {
