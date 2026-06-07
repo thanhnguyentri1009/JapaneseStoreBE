@@ -10,8 +10,8 @@ import { Order } from './order.entity';
 
 @Entity('customers')
 export class Customer {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 150 })
   name: string;

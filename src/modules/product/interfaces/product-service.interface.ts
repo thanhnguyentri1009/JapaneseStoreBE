@@ -6,9 +6,9 @@ export const PRODUCT_SERVICE = Symbol('PRODUCT_SERVICE');
 
 export interface IProductService {
   findAll(): Promise<Product[]>;
-  findById(id: number): Promise<Product>;
-  findByCategoryId(categoryId: number): Promise<Product[]>;
+  findById(id: string): Promise<Product>;
+  findByCategoryId(categoryId: string): Promise<Product[]>;
   create(dto: CreateProductDto): Promise<Product>;
-  update(id: number, dto: UpdateProductDto): Promise<Product>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateProductDto): Promise<Product>;
+  remove(id: string): Promise<void>;
 }

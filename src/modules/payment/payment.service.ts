@@ -17,13 +17,13 @@ export class PaymentService implements IPaymentService {
     return this.repo.find();
   }
 
-  async findById(id: number): Promise<Payment> {
+  async findById(id: string): Promise<Payment> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Payment #${id} not found`);
     return entity;
   }
 
-  async findByOrderId(orderId: number): Promise<Payment> {
+  async findByOrderId(orderId: string): Promise<Payment> {
     const entity = await this.repo.findOne({ where: { orderId } });
     if (!entity) throw new NotFoundException(`Payment for Order #${orderId} not found`);
     return entity;
@@ -33,12 +33,12 @@ export class PaymentService implements IPaymentService {
     return this.repo.save(this.repo.create(dto));
   }
 
-  async update(id: number, dto: UpdatePaymentDto): Promise<Payment> {
+  async update(id: string, dto: UpdatePaymentDto): Promise<Payment> {
     const entity = await this.findById(id);
     return this.repo.save({ ...entity, ...dto });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
   }

@@ -23,16 +23,16 @@ export enum PaymentStatus {
 
 @Entity('payments')
 export class Payment {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @OneToOne(() => Order, (order) => order.payment, { nullable: true })
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
   @Index()
-  @Column({ name: 'order_id', nullable: true })
-  orderId: number;
+  @Column({ name: 'order_id', nullable: true, type: 'uuid' })
+  orderId: string;
 
   @Column({ length: 50, nullable: true })
   method: string;

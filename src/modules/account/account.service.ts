@@ -67,7 +67,7 @@ export class AccountService implements IAccountService {
     return data.map((a) => this.omit(a));
   }
 
-  async findById(id: number): Promise<SafeAccount> {
+  async findById(id: string): Promise<SafeAccount> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
     return this.omit(entity);
@@ -91,7 +91,7 @@ export class AccountService implements IAccountService {
     return this.omit(saved);
   }
 
-  async update(id: number, dto: UpdateAccountDto): Promise<SafeAccount> {
+  async update(id: string, dto: UpdateAccountDto): Promise<SafeAccount> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
 
@@ -103,7 +103,7 @@ export class AccountService implements IAccountService {
     return this.omit(saved);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
     await this.repo.remove(entity);
@@ -147,7 +147,7 @@ export class AccountService implements IAccountService {
   }
 
   async changeRole(
-    accountId: number,
+    accountId: string,
     dto: ChangeRoleDto,
   ): Promise<SafeAccount> {
     const entity = await this.repo.findOne({ where: { id: accountId } });

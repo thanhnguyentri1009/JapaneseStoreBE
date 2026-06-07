@@ -37,7 +37,7 @@ export class ProductColorService implements IProductColorService {
     return data;
   }
 
-  async findById(id: number): Promise<ProductColor> {
+  async findById(id: string): Promise<ProductColor> {
     try {
       const cached = await this.cache.get<ProductColor>(`product-color:${id}`);
       if (cached) return cached;
@@ -57,12 +57,17 @@ export class ProductColorService implements IProductColorService {
     return entity;
   }
 
-  async findByProductId(productId: number): Promise<ProductColor[]> {
+  async findByProductId(productId: string): Promise<ProductColor[]> {
     try {
-      const cached = await this.cache.get<ProductColor[]>(`product-colors:product:${productId}`);
+      const cached = await this.cache.get<ProductColor[]>(
+        `product-colors:product:${productId}`,
+      );
       if (cached) return cached;
     } catch (error) {
-      this.logger.error(`Cache get failed for product-colors:product:${productId}`, error);
+      this.logger.error(
+        `Cache get failed for product-colors:product:${productId}`,
+        error,
+      );
     }
 
     const data = await this.repo.find({ where: { productId } });
@@ -70,7 +75,10 @@ export class ProductColorService implements IProductColorService {
     try {
       await this.cache.set(`product-colors:product:${productId}`, data);
     } catch (error) {
-      this.logger.error(`Cache set failed for product-colors:product:${productId}`, error);
+      this.logger.error(
+        `Cache set failed for product-colors:product:${productId}`,
+        error,
+      );
     }
 
     return data;
@@ -80,35 +88,44 @@ export class ProductColorService implements IProductColorService {
     const result = await this.repo.save(this.repo.create(dto));
     try {
       await this.cache.del('product-colors');
-      if (dto.productId) await this.cache.del(`product-colors:product:${dto.productId}`);
+      if (dto.productId)
+        await this.cache.del(`product-colors:product:${dto.productId}`);
     } catch (error) {
       this.logger.error('Cache del failed after product-color create', error);
     }
     return result;
   }
 
-  async update(id: number, dto: UpdateProductColorDto): Promise<ProductColor> {
+  async update(id: string, dto: UpdateProductColorDto): Promise<ProductColor> {
     const entity = await this.findById(id);
     const result = await this.repo.save({ ...entity, ...dto });
     try {
       await this.cache.del('product-colors');
       await this.cache.del(`product-color:${id}`);
-      if (entity.productId) await this.cache.del(`product-colors:product:${entity.productId}`);
+      if (entity.productId)
+        await this.cache.del(`product-colors:product:${entity.productId}`);
     } catch (error) {
-      this.logger.error(`Cache del failed after product-color:${id} update`, error);
+      this.logger.error(
+        `Cache del failed after product-color:${id} update`,
+        error,
+      );
     }
     return result;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
     try {
       await this.cache.del('product-colors');
       await this.cache.del(`product-color:${id}`);
-      if (entity.productId) await this.cache.del(`product-colors:product:${entity.productId}`);
+      if (entity.productId)
+        await this.cache.del(`product-colors:product:${entity.productId}`);
     } catch (error) {
-      this.logger.error(`Cache del failed after product-color:${id} remove`, error);
+      this.logger.error(
+        `Cache del failed after product-color:${id} remove`,
+        error,
+      );
     }
   }
 }

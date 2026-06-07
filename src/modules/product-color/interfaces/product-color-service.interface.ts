@@ -6,9 +6,9 @@ export const PRODUCT_COLOR_SERVICE = Symbol('PRODUCT_COLOR_SERVICE');
 
 export interface IProductColorService {
   findAll(): Promise<ProductColor[]>;
-  findById(id: number): Promise<ProductColor>;
-  findByProductId(productId: number): Promise<ProductColor[]>;
+  findById(id: string): Promise<ProductColor>;
+  findByProductId(productId: string): Promise<ProductColor[]>;
   create(dto: CreateProductColorDto): Promise<ProductColor>;
-  update(id: number, dto: UpdateProductColorDto): Promise<ProductColor>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateProductColorDto): Promise<ProductColor>;
+  remove(id: string): Promise<void>;
 }

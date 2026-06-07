@@ -12,8 +12,8 @@ import { Order } from './order.entity';
 
 @Entity('addresses')
 export class Address {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Customer, (customer) => customer.addresses, {
     nullable: true,
@@ -22,8 +22,8 @@ export class Address {
   customer: Customer;
 
   @Index()
-  @Column({ name: 'customer_id', nullable: true })
-  customerId: number;
+  @Column({ name: 'customer_id', nullable: true, type: 'uuid' })
+  customerId: string;
 
   @Column({ type: 'text' })
   address: string;

@@ -3,8 +3,8 @@ import { Role } from './role.entity';
 
 @Entity('accounts')
 export class Account {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 100, unique: true })
   username: string;

@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   Inject,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ACCOUNT_SERVICE,
@@ -19,7 +18,9 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('accounts')
 export class AccountController {
   constructor(
@@ -33,7 +34,7 @@ export class AccountController {
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
@@ -43,12 +44,12 @@ export class AccountController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAccountDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateAccountDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
 
@@ -71,10 +72,7 @@ export class AccountController {
   }
 
   @Patch(':id/role')
-  changeRole(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ChangeRoleDto,
-  ) {
+  changeRole(@Param('id') id: string, @Body() dto: ChangeRoleDto) {
     return this.service.changeRole(id, dto);
   }
 }

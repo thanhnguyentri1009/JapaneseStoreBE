@@ -16,11 +16,11 @@ export interface TokenPair {
 
 export interface IAccountService {
   findAll(): Promise<SafeAccount[]>;
-  findById(id: number): Promise<SafeAccount>;
+  findById(id: string): Promise<SafeAccount>;
   create(dto: CreateAccountDto): Promise<SafeAccount>;
-  update(id: number, dto: UpdateAccountDto): Promise<SafeAccount>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateAccountDto): Promise<SafeAccount>;
+  remove(id: string): Promise<void>;
   login(dto: LoginDto): Promise<TokenPair>;
   refresh(dto: RefreshTokenDto): Promise<TokenPair>;
-  changeRole(accountId: number, dto: ChangeRoleDto): Promise<SafeAccount>;
+  changeRole(accountId: string, dto: ChangeRoleDto): Promise<SafeAccount>;
 }

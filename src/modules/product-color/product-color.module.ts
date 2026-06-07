@@ -8,7 +8,9 @@ import { PRODUCT_COLOR_SERVICE } from './interfaces/product-color-service.interf
 @Module({
   imports: [TypeOrmModule.forFeature([ProductColor])],
   controllers: [ProductColorController],
-  providers: [{ provide: PRODUCT_COLOR_SERVICE, useClass: ProductColorService }],
+  providers: [
+    { provide: PRODUCT_COLOR_SERVICE, useClass: ProductColorService },
+  ],
   exports: [PRODUCT_COLOR_SERVICE],
 })
 export class ProductColorModule {}

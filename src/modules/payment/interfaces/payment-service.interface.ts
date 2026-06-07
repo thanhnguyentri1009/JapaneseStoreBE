@@ -6,9 +6,9 @@ export const PAYMENT_SERVICE = Symbol('PAYMENT_SERVICE');
 
 export interface IPaymentService {
   findAll(): Promise<Payment[]>;
-  findById(id: number): Promise<Payment>;
-  findByOrderId(orderId: number): Promise<Payment>;
+  findById(id: string): Promise<Payment>;
+  findByOrderId(orderId: string): Promise<Payment>;
   create(dto: CreatePaymentDto): Promise<Payment>;
-  update(id: number, dto: UpdatePaymentDto): Promise<Payment>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdatePaymentDto): Promise<Payment>;
+  remove(id: string): Promise<void>;
 }

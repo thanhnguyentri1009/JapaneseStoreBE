@@ -20,13 +20,13 @@ export class AddressService implements IAddressService {
     return this.repo.find();
   }
 
-  async findById(id: number): Promise<Address> {
+  async findById(id: string): Promise<Address> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Address #${id} not found`);
     return entity;
   }
 
-  findByCustomerId(customerId: number): Promise<Address[]> {
+  findByCustomerId(customerId: string): Promise<Address[]> {
     return this.repo.find({ where: { customerId } });
   }
 
@@ -34,12 +34,12 @@ export class AddressService implements IAddressService {
     return this.repo.save(this.repo.create(dto));
   }
 
-  async update(id: number, dto: UpdateAddressDto): Promise<Address> {
+  async update(id: string, dto: UpdateAddressDto): Promise<Address> {
     const entity = await this.findById(id);
     return this.repo.save({ ...entity, ...dto });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
   }

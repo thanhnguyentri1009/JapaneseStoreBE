@@ -16,8 +16,8 @@ import { OrderItem } from './order-item.entity';
 @Index(['isActive', 'categoryId'])
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Category, (category) => category.products, {
     nullable: true,
@@ -26,8 +26,8 @@ export class Product {
   category: Category;
 
   @Index()
-  @Column({ name: 'category_id', nullable: true })
-  categoryId: number;
+  @Column({ name: 'category_id', nullable: true, type: 'uuid' })
+  categoryId: string;
 
   @Column({ length: 200 })
   name: string;

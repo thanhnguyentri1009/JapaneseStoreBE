@@ -37,7 +37,7 @@ export class CustomerService implements ICustomerService {
     return data;
   }
 
-  async findById(id: number): Promise<Customer> {
+  async findById(id: string): Promise<Customer> {
     try {
       const cached = await this.cache.get<Customer>(`customer:${id}`);
       if (cached) return cached;
@@ -87,7 +87,7 @@ export class CustomerService implements ICustomerService {
     return result;
   }
 
-  async update(id: number, dto: UpdateCustomerDto): Promise<Customer> {
+  async update(id: string, dto: UpdateCustomerDto): Promise<Customer> {
     const entity = await this.findById(id);
     const result = await this.repo.save({ ...entity, ...dto });
     try {
@@ -103,7 +103,7 @@ export class CustomerService implements ICustomerService {
     return result;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
     try {

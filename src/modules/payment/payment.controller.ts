@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Inject, ParseIntPipe } from '@nestjs/common';
-import { PAYMENT_SERVICE, IPaymentService } from './interfaces/payment-service.interface';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Inject,
+} from '@nestjs/common';
+import {
+  PAYMENT_SERVICE,
+  IPaymentService,
+} from './interfaces/payment-service.interface';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('payments')
 export class PaymentController {
   constructor(
@@ -16,12 +30,12 @@ export class PaymentController {
   }
 
   @Get('order/:orderId')
-  findByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
+  findByOrderId(@Param('orderId') orderId: string) {
     return this.service.findByOrderId(orderId);
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
@@ -31,12 +45,12 @@ export class PaymentController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePaymentDto) {
+  update(@Param('id') id: string, @Body() dto: UpdatePaymentDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
 }

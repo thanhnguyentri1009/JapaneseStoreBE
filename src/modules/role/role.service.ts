@@ -25,7 +25,7 @@ export class RoleService implements OnApplicationBootstrap {
     return this.repo.find();
   }
 
-  async findById(id: number): Promise<Role> {
+  async findById(id: string): Promise<Role> {
     const role = await this.repo.findOne({ where: { id } });
     if (!role) throw new NotFoundException(`Role #${id} not found`);
     return role;

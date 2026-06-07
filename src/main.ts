@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('Japanese Store API')
     .setDescription('API documentation for Japanese Store Backend')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   Inject,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   CATEGORY_SERVICE,
@@ -15,7 +14,9 @@ import {
 } from './interfaces/category-service.interface';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('categories')
 export class CategoryController {
   constructor(
@@ -29,7 +30,7 @@ export class CategoryController {
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
@@ -39,15 +40,12 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCategoryDto,
-  ) {
+  update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
 }

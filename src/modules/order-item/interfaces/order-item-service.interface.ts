@@ -6,9 +6,9 @@ export const ORDER_ITEM_SERVICE = Symbol('ORDER_ITEM_SERVICE');
 
 export interface IOrderItemService {
   findAll(): Promise<OrderItem[]>;
-  findById(id: number): Promise<OrderItem>;
-  findByOrderId(orderId: number): Promise<OrderItem[]>;
+  findById(id: string): Promise<OrderItem>;
+  findByOrderId(orderId: string): Promise<OrderItem[]>;
   create(dto: CreateOrderItemDto): Promise<OrderItem>;
-  update(id: number, dto: UpdateOrderItemDto): Promise<OrderItem>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateOrderItemDto): Promise<OrderItem>;
+  remove(id: string): Promise<void>;
 }

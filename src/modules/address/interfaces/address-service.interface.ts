@@ -6,9 +6,9 @@ export const ADDRESS_SERVICE = Symbol('ADDRESS_SERVICE');
 
 export interface IAddressService {
   findAll(): Promise<Address[]>;
-  findById(id: number): Promise<Address>;
-  findByCustomerId(customerId: number): Promise<Address[]>;
+  findById(id: string): Promise<Address>;
+  findByCustomerId(customerId: string): Promise<Address[]>;
   create(dto: CreateAddressDto): Promise<Address>;
-  update(id: number, dto: UpdateAddressDto): Promise<Address>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateAddressDto): Promise<Address>;
+  remove(id: string): Promise<void>;
 }

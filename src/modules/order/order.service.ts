@@ -17,7 +17,7 @@ export class OrderService implements IOrderService {
     return this.repo.find({ relations: ['items', 'payment'] });
   }
 
-  async findById(id: number): Promise<Order> {
+  async findById(id: string): Promise<Order> {
     const entity = await this.repo.findOne({
       where: { id },
       relations: ['items', 'items.product', 'payment', 'address'],
@@ -26,20 +26,23 @@ export class OrderService implements IOrderService {
     return entity;
   }
 
-  findByCustomerId(customerId: number): Promise<Order[]> {
-    return this.repo.find({ where: { customerId }, relations: ['items', 'payment'] });
+  findByCustomerId(customerId: string): Promise<Order[]> {
+    return this.repo.find({
+      where: { customerId },
+      relations: ['items', 'payment'],
+    });
   }
 
   create(dto: CreateOrderDto): Promise<Order> {
     return this.repo.save(this.repo.create(dto));
   }
 
-  async update(id: number, dto: UpdateOrderDto): Promise<Order> {
+  async update(id: string, dto: UpdateOrderDto): Promise<Order> {
     const entity = await this.findById(id);
     return this.repo.save({ ...entity, ...dto });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
   }

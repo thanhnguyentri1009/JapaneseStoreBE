@@ -25,23 +25,23 @@ export enum OrderStatus {
 @Index(['customerId', 'status'])
 @Entity('orders')
 export class Order {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => Customer, (customer) => customer.orders, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
   @Index()
-  @Column({ name: 'customer_id', nullable: true })
-  customerId: number;
+  @Column({ name: 'customer_id', nullable: true, type: 'uuid' })
+  customerId: string;
 
   @ManyToOne(() => Address, (address) => address.orders, { nullable: true })
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
-  @Column({ name: 'address_id', nullable: true })
-  addressId: number;
+  @Column({ name: 'address_id', nullable: true, type: 'uuid' })
+  addressId: string;
 
   @Index()
   @Column({ length: 30, default: OrderStatus.PENDING })

@@ -6,8 +6,8 @@ export const CATEGORY_SERVICE = Symbol('CATEGORY_SERVICE');
 
 export interface ICategoryService {
   findAll(): Promise<Category[]>;
-  findById(id: number): Promise<Category>;
+  findById(id: string): Promise<Category>;
   create(dto: CreateCategoryDto): Promise<Category>;
-  update(id: number, dto: UpdateCategoryDto): Promise<Category>;
-  remove(id: number): Promise<void>;
+  update(id: string, dto: UpdateCategoryDto): Promise<Category>;
+  remove(id: string): Promise<void>;
 }

@@ -7,7 +7,6 @@ import {
   Param,
   Body,
   Inject,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ADDRESS_SERVICE,
@@ -15,7 +14,9 @@ import {
 } from './interfaces/address-service.interface';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('addresses')
 export class AddressController {
   constructor(
@@ -29,12 +30,12 @@ export class AddressController {
   }
 
   @Get('customer/:customerId')
-  findByCustomerId(@Param('customerId', ParseIntPipe) customerId: number) {
+  findByCustomerId(@Param('customerId') customerId: string) {
     return this.service.findByCustomerId(customerId);
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
@@ -44,12 +45,12 @@ export class AddressController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateAddressDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateAddressDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
 }

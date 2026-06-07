@@ -17,13 +17,16 @@ export class OrderItemService implements IOrderItemService {
     return this.repo.find({ relations: ['product'] });
   }
 
-  async findById(id: number): Promise<OrderItem> {
-    const entity = await this.repo.findOne({ where: { id }, relations: ['product'] });
+  async findById(id: string): Promise<OrderItem> {
+    const entity = await this.repo.findOne({
+      where: { id },
+      relations: ['product'],
+    });
     if (!entity) throw new NotFoundException(`OrderItem #${id} not found`);
     return entity;
   }
 
-  findByOrderId(orderId: number): Promise<OrderItem[]> {
+  findByOrderId(orderId: string): Promise<OrderItem[]> {
     return this.repo.find({ where: { orderId }, relations: ['product'] });
   }
 
@@ -31,12 +34,12 @@ export class OrderItemService implements IOrderItemService {
     return this.repo.save(this.repo.create(dto));
   }
 
-  async update(id: number, dto: UpdateOrderItemDto): Promise<OrderItem> {
+  async update(id: string, dto: UpdateOrderItemDto): Promise<OrderItem> {
     const entity = await this.findById(id);
     return this.repo.save({ ...entity, ...dto });
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
   }

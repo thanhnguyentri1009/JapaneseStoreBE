@@ -37,7 +37,7 @@ export class ProductService implements IProductService {
     return data;
   }
 
-  async findById(id: number): Promise<Product> {
+  async findById(id: string): Promise<Product> {
     try {
       const cached = await this.cache.get<Product>(`product:${id}`);
       if (cached) return cached;
@@ -57,7 +57,7 @@ export class ProductService implements IProductService {
     return entity;
   }
 
-  async findByCategoryId(categoryId: number): Promise<Product[]> {
+  async findByCategoryId(categoryId: string): Promise<Product[]> {
     try {
       const cached = await this.cache.get<Product[]>(`products:category:${categoryId}`);
       if (cached) return cached;
@@ -87,7 +87,7 @@ export class ProductService implements IProductService {
     return result;
   }
 
-  async update(id: number, dto: UpdateProductDto): Promise<Product> {
+  async update(id: string, dto: UpdateProductDto): Promise<Product> {
     const entity = await this.findById(id);
     const result = await this.repo.save({ ...entity, ...dto });
     try {
@@ -103,7 +103,7 @@ export class ProductService implements IProductService {
     return result;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
     try {

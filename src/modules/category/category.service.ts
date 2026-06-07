@@ -37,7 +37,7 @@ export class CategoryService implements ICategoryService {
     return data;
   }
 
-  async findById(id: number): Promise<Category> {
+  async findById(id: string): Promise<Category> {
     try {
       const cached = await this.cache.get<Category>(`category:${id}`);
       if (cached) return cached;
@@ -67,7 +67,7 @@ export class CategoryService implements ICategoryService {
     return result;
   }
 
-  async update(id: number, dto: UpdateCategoryDto): Promise<Category> {
+  async update(id: string, dto: UpdateCategoryDto): Promise<Category> {
     const entity = await this.findById(id);
     const result = await this.repo.save({ ...entity, ...dto });
     try {
@@ -79,7 +79,7 @@ export class CategoryService implements ICategoryService {
     return result;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const entity = await this.findById(id);
     await this.repo.remove(entity);
     try {

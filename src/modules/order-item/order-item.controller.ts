@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Inject, ParseIntPipe } from '@nestjs/common';
-import { ORDER_ITEM_SERVICE, IOrderItemService } from './interfaces/order-item-service.interface';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Inject,
+} from '@nestjs/common';
+import {
+  ORDER_ITEM_SERVICE,
+  IOrderItemService,
+} from './interfaces/order-item-service.interface';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('order-items')
 export class OrderItemController {
   constructor(
@@ -16,12 +30,12 @@ export class OrderItemController {
   }
 
   @Get('order/:orderId')
-  findByOrderId(@Param('orderId', ParseIntPipe) orderId: number) {
+  findByOrderId(@Param('orderId') orderId: string) {
     return this.service.findByOrderId(orderId);
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
+  findById(@Param('id') id: string) {
     return this.service.findById(id);
   }
 
@@ -31,12 +45,12 @@ export class OrderItemController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrderItemDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateOrderItemDto) {
     return this.service.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
 }
