@@ -47,7 +47,13 @@ export class Order {
   @Column({ length: 30, default: OrderStatus.PENDING })
   status: string;
 
-  @Column({ name: 'total_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    name: 'total_amount',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
   totalAmount: number;
 
   @Index()

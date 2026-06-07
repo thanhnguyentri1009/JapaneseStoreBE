@@ -19,7 +19,9 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
+  @ManyToOne(() => Category, (category) => category.products, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'category_id' })
   category: Category;
 

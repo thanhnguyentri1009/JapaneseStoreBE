@@ -1,5 +1,18 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Inject, ParseIntPipe } from '@nestjs/common';
-import { CATEGORY_SERVICE, ICategoryService } from './interfaces/category-service.interface';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Inject,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  CATEGORY_SERVICE,
+  ICategoryService,
+} from './interfaces/category-service.interface';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -26,7 +39,10 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateCategoryDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoryDto,
+  ) {
     return this.service.update(id, dto);
   }
 
