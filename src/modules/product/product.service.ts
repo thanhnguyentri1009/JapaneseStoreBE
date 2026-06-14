@@ -8,6 +8,8 @@ import { IProductService } from './interfaces/product-service.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
+const RELATIONS = ['category', 'brand'];
+
 @Injectable()
 export class ProductService implements IProductService {
   private readonly logger = new Logger(ProductService.name);
@@ -26,7 +28,7 @@ export class ProductService implements IProductService {
       this.logger.error('Cache get failed for products', error);
     }
 
-    const data = await this.repo.find({ relations: ['category', 'colors'] });
+    const data = await this.repo.find({ relations: RELATIONS });
 
     try {
       await this.cache.set('products', data);
@@ -47,7 +49,7 @@ export class ProductService implements IProductService {
 
     const entity = await this.repo.findOne({
       where: { id },
-      relations: ['category', 'colors'],
+      relations: RELATIONS,
     });
     if (!entity) throw new NotFoundException(`Product #${id} not found`);
 
@@ -75,7 +77,7 @@ export class ProductService implements IProductService {
 
     const data = await this.repo.find({
       where: { categoryId },
-      relations: ['colors'],
+      relations: RELATIONS,
     });
 
     try {
@@ -90,12 +92,43 @@ export class ProductService implements IProductService {
     return data;
   }
 
+  async findByBrandId(brandId: string): Promise<Product[]> {
+    try {
+      const cached = await this.cache.get<Product[]>(
+        `products:brand:${brandId}`,
+      );
+      if (cached) return cached;
+    } catch (error) {
+      this.logger.error(
+        `Cache get failed for products:brand:${brandId}`,
+        error,
+      );
+    }
+
+    const data = await this.repo.find({
+      where: { brandId },
+      relations: RELATIONS,
+    });
+
+    try {
+      await this.cache.set(`products:brand:${brandId}`, data);
+    } catch (error) {
+      this.logger.error(
+        `Cache set failed for products:brand:${brandId}`,
+        error,
+      );
+    }
+
+    return data;
+  }
+
   async create(dto: CreateProductDto): Promise<Product> {
     const result = await this.repo.save(this.repo.create(dto));
     try {
       await this.cache.del('products');
       if (dto.categoryId)
         await this.cache.del(`products:category:${dto.categoryId}`);
+      if (dto.brandId) await this.cache.del(`products:brand:${dto.brandId}`);
     } catch (error) {
       this.logger.error('Cache del failed after product create', error);
     }
@@ -110,9 +143,12 @@ export class ProductService implements IProductService {
       await this.cache.del(`product:${id}`);
       if (entity.categoryId)
         await this.cache.del(`products:category:${entity.categoryId}`);
-      if (dto.categoryId && dto.categoryId !== entity.categoryId) {
+      if (dto.categoryId && dto.categoryId !== entity.categoryId)
         await this.cache.del(`products:category:${dto.categoryId}`);
-      }
+      if (entity.brandId)
+        await this.cache.del(`products:brand:${entity.brandId}`);
+      if (dto.brandId && dto.brandId !== entity.brandId)
+        await this.cache.del(`products:brand:${dto.brandId}`);
     } catch (error) {
       this.logger.error(`Cache del failed after product:${id} update`, error);
     }
@@ -127,6 +163,8 @@ export class ProductService implements IProductService {
       await this.cache.del(`product:${id}`);
       if (entity.categoryId)
         await this.cache.del(`products:category:${entity.categoryId}`);
+      if (entity.brandId)
+        await this.cache.del(`products:brand:${entity.brandId}`);
     } catch (error) {
       this.logger.error(`Cache del failed after product:${id} remove`, error);
     }

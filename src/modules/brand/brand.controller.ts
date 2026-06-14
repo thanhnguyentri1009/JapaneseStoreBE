@@ -8,22 +8,18 @@ import {
   Body,
   Inject,
 } from '@nestjs/common';
-import {
-  ACCOUNT_SERVICE,
-  IAccountService,
-} from './interfaces/account-service.interface';
-import { CreateAccountDto } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
-import { ChangeRoleDto } from './dto/change-role.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  BRAND_SERVICE,
+  IBrandService,
+} from './interfaces/brand-service.interface';
+import { CreateBrandDto } from './dto/create-brand.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @ApiBearerAuth()
-@Controller('accounts')
-export class AccountController {
-  constructor(
-    @Inject(ACCOUNT_SERVICE)
-    private readonly service: IAccountService,
-  ) {}
+@Controller('brands')
+export class BrandController {
+  constructor(@Inject(BRAND_SERVICE) private readonly service: IBrandService) {}
 
   @Get()
   findAll() {
@@ -36,12 +32,12 @@ export class AccountController {
   }
 
   @Post()
-  create(@Body() dto: CreateAccountDto) {
+  create(@Body() dto: CreateBrandDto) {
     return this.service.create(dto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateAccountDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateBrandDto) {
     return this.service.update(id, dto);
   }
 

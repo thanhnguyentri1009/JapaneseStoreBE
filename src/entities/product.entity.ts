@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Category } from './category.entity';
-import { ProductColor } from './product-color.entity';
+import { Brand } from './brand.entity';
 import { OrderItem } from './order-item.entity';
 
 @Index(['series', 'inkType'])
@@ -29,6 +29,14 @@ export class Product {
   @Column({ name: 'category_id', nullable: true, type: 'uuid' })
   categoryId: string;
 
+  @ManyToOne(() => Brand, (brand) => brand.products, { nullable: true })
+  @JoinColumn({ name: 'brand_id' })
+  brand: Brand;
+
+  @Index()
+  @Column({ name: 'brand_id', nullable: true, type: 'uuid' })
+  brandId: string;
+
   @Column({ length: 200 })
   name: string;
 
@@ -43,9 +51,6 @@ export class Product {
   @Column({ name: 'ink_type', length: 30, nullable: true })
   inkType: string;
 
-  @Column({ name: 'color_count', nullable: true })
-  colorCount: number;
-
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
@@ -58,9 +63,6 @@ export class Product {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
-
-  @OneToMany(() => ProductColor, (color) => color.product)
-  colors: ProductColor[];
 
   @OneToMany(() => OrderItem, (item) => item.product)
   orderItems: OrderItem[];

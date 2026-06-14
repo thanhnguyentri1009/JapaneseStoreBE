@@ -7,7 +7,6 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
-import { ProductColorModule } from './modules/product-color/product-color.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { AddressModule } from './modules/address/address.module';
 import { OrderModule } from './modules/order/order.module';
@@ -15,6 +14,9 @@ import { OrderItemModule } from './modules/order-item/order-item.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { AccountModule } from './modules/account/account.module';
 import { RoleModule } from './modules/role/role.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { BrandModule } from './modules/brand/brand.module';
+import { ProfileModule } from './modules/profile/profile.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 
@@ -29,7 +31,7 @@ import { redisStore } from 'cache-manager-redis-yet';
             host: process.env.REDIS_HOST ?? 'localhost',
             port: parseInt(process.env.REDIS_PORT ?? '6379'),
           },
-          ttl: 60 * 1000, // 60 giây (milliseconds)
+          ttl: 60 * 1000,
         }),
       }),
     }),
@@ -50,7 +52,6 @@ import { redisStore } from 'cache-manager-redis-yet';
     }),
     CategoryModule,
     ProductModule,
-    ProductColorModule,
     CustomerModule,
     AddressModule,
     OrderModule,
@@ -58,6 +59,9 @@ import { redisStore } from 'cache-manager-redis-yet';
     PaymentModule,
     AccountModule,
     RoleModule,
+    AuthModule,
+    BrandModule,
+    ProfileModule,
     JwtModule.register({}),
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],

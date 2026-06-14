@@ -9,6 +9,7 @@ export interface IOrderItemService {
   findById(id: string): Promise<OrderItem>;
   findByOrderId(orderId: string): Promise<OrderItem[]>;
   create(dto: CreateOrderItemDto): Promise<OrderItem>;
+  createList(dtos: CreateOrderItemDto[]): Promise<OrderItem[]>;
   update(id: string, dto: UpdateOrderItemDto): Promise<OrderItem>;
   remove(id: string): Promise<void>;
 }

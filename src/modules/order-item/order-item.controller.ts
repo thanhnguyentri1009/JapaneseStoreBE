@@ -15,6 +15,15 @@ import {
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class CreateOrderItemListDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  items: CreateOrderItemDto[];
+}
 
 @ApiBearerAuth()
 @Controller('order-items')
@@ -42,6 +51,11 @@ export class OrderItemController {
   @Post()
   create(@Body() dto: CreateOrderItemDto) {
     return this.service.create(dto);
+  }
+
+  @Post('bulk')
+  createList(@Body() body: CreateOrderItemListDto) {
+    return this.service.createList(body.items);
   }
 
   @Patch(':id')

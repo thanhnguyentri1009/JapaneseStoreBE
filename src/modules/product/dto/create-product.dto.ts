@@ -13,6 +13,10 @@ export class CreateProductDto {
   @IsUUID()
   categoryId?: string;
 
+  @IsOptional()
+  @IsUUID()
+  brandId?: string;
+
   @IsString()
   name: string;
 

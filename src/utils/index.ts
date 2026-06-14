@@ -1,0 +1,2 @@
+export const ACCESS_TOKEN = 'JWT_ACCESS_SECRET';
+export const REFRESH_TOKEN = 'JWT_REFRESH_SECRET';

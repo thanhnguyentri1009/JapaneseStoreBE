@@ -34,6 +34,11 @@ export class ProductController {
     return this.service.findByCategoryId(categoryId);
   }
 
+  @Get('brand/:brandId')
+  findByBrandId(@Param('brandId') brandId: string) {
+    return this.service.findByBrandId(brandId);
+  }
+
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.service.findById(id);

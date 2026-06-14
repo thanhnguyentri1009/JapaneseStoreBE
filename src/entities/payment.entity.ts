@@ -9,10 +9,10 @@ import {
 import { Order } from './order.entity';
 
 export enum PaymentMethod {
-  COD = 'COD',
-  BANK_TRANSFER = 'Bank Transfer',
-  MOMO = 'Momo',
-  VNPAY = 'VNPay',
+  COD = 'cod',
+  BANK_TRANSFER = 'bank_transfer',
+  MOMO = 'momo',
+  VNPAY = 'vnPay',
 }
 
 export enum PaymentStatus {
