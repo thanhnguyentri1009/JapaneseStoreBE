@@ -1,4 +1,5 @@
 export * from './category.entity';
+export * from './product-detail.entity';
 export * from './product.entity';
 export * from './profile.entity';
 export * from './customer.entity';
