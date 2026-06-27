@@ -1,13 +1,17 @@
-import { Category } from '../../../entities/category.entity';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CategoryResponseDto } from '../dto/category-response.dto';
+import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
 
 export const CATEGORY_SERVICE = Symbol('CATEGORY_SERVICE');
 
 export interface ICategoryService {
-  findAll(): Promise<Category[]>;
-  findById(id: string): Promise<Category>;
-  create(dto: CreateCategoryDto): Promise<Category>;
-  update(id: string, dto: UpdateCategoryDto): Promise<Category>;
+  findAll(
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<CategoryResponseDto>>;
+  findById(id: string): Promise<CategoryResponseDto>;
+  create(dto: CreateCategoryDto): Promise<CategoryResponseDto>;
+  update(id: string, dto: UpdateCategoryDto): Promise<CategoryResponseDto>;
   remove(id: string): Promise<void>;
 }

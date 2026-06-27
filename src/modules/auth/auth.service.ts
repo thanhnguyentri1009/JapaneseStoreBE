@@ -14,8 +14,8 @@ import { Profile } from '../../entities/profile.entity';
 import {
   ACCOUNT_SERVICE,
   IAccountService,
-  SafeAccount,
 } from '../account/interfaces/account-service.interface';
+import { AccountResponseDto } from '../account/dto/account-response.dto';
 import { IAuthService, TokenPair } from './interfaces/auth-service.interface';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -57,7 +57,7 @@ export class AuthService implements IAuthService {
     return { access_token, refresh_token };
   }
 
-  async register(dto: CreateAccountDto): Promise<SafeAccount> {
+  async register(dto: CreateAccountDto): Promise<AccountResponseDto> {
     const account = await this.accountService.create(dto);
     await this.profileRepo.save(
       this.profileRepo.create({

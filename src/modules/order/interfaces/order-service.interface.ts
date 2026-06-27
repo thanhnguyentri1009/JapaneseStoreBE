@@ -1,14 +1,18 @@
-import { Order } from '../../../entities/order.entity';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
+import { OrderResponseDto } from '../dto/order-response.dto';
+import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
 
 export const ORDER_SERVICE = Symbol('ORDER_SERVICE');
 
 export interface IOrderService {
-  findAll(): Promise<Order[]>;
-  findById(id: string): Promise<Order>;
-  findByCustomerId(customerId: string): Promise<Order[]>;
-  create(dto: CreateOrderDto): Promise<Order>;
-  update(id: string, dto: UpdateOrderDto): Promise<Order>;
+  findAll(
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<OrderResponseDto>>;
+  findById(id: string): Promise<OrderResponseDto>;
+  findByCustomerId(customerId: string): Promise<OrderResponseDto[]>;
+  create(dto: CreateOrderDto): Promise<OrderResponseDto>;
+  update(id: string, dto: UpdateOrderDto): Promise<OrderResponseDto>;
   remove(id: string): Promise<void>;
 }

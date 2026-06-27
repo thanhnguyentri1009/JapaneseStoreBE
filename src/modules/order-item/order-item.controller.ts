@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Inject,
+  Query,
 } from '@nestjs/common';
 import {
   ORDER_ITEM_SERVICE,
@@ -17,6 +18,7 @@ import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 class CreateOrderItemListDto {
   @IsArray()
@@ -34,8 +36,8 @@ export class OrderItemController {
   ) {}
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query() { page, perPage }: PaginationDto) {
+    return this.service.findAll(page, perPage);
   }
 
   @Get('order/:orderId')

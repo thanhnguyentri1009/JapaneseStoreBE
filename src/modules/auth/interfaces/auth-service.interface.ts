@@ -1,4 +1,4 @@
-import { SafeAccount } from '../../account/interfaces/account-service.interface';
+import { AccountResponseDto } from '../../account/dto/account-response.dto';
 import { CreateAccountDto } from '../../account/dto/create-account.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
@@ -11,7 +11,7 @@ export interface TokenPair {
 }
 
 export interface IAuthService {
-  register(dto: CreateAccountDto): Promise<SafeAccount>;
+  register(dto: CreateAccountDto): Promise<AccountResponseDto>;
   login(dto: LoginDto): Promise<TokenPair>;
   refresh(dto: RefreshTokenDto): Promise<TokenPair>;
 }

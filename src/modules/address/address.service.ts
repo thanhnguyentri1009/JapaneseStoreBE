@@ -5,8 +5,10 @@ import { Address } from '../../entities/address.entity';
 import { IAddressService } from './interfaces/address-service.interface';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
+import { AddressResponseDto } from './dto/address-response.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 @Injectable()
 export class AddressService implements IAddressService {
@@ -16,31 +18,45 @@ export class AddressService implements IAddressService {
     private readonly repo: Repository<Address>,
   ) {}
 
-  async findAll(): Promise<Address[]> {
-    return this.repo.find();
+  async findAll(
+    page = 1,
+    perPage = 10,
+  ): Promise<PaginatedResult<AddressResponseDto>> {
+    const [data, total] = await this.repo.findAndCount({
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data: data.map(AddressResponseDto.from), page, perPage, total };
   }
 
-  async findById(id: string): Promise<Address> {
+  private async getEntity(id: string): Promise<Address> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Address #${id} not found`);
     return entity;
   }
 
-  findByCustomerId(customerId: string): Promise<Address[]> {
-    return this.repo.find({ where: { customerId } });
+  async findById(id: string): Promise<AddressResponseDto> {
+    return AddressResponseDto.from(await this.getEntity(id));
   }
 
-  create(dto: CreateAddressDto): Promise<Address> {
-    return this.repo.save(this.repo.create(dto));
+  async findByCustomerId(customerId: string): Promise<AddressResponseDto[]> {
+    const data = await this.repo.find({ where: { customerId } });
+    return data.map(AddressResponseDto.from);
   }
 
-  async update(id: string, dto: UpdateAddressDto): Promise<Address> {
-    const entity = await this.findById(id);
-    return this.repo.save({ ...entity, ...dto });
+  async create(dto: CreateAddressDto): Promise<AddressResponseDto> {
+    const result = await this.repo.save(this.repo.create(dto));
+    return AddressResponseDto.from(result);
+  }
+
+  async update(id: string, dto: UpdateAddressDto): Promise<AddressResponseDto> {
+    const entity = await this.getEntity(id);
+    const result = await this.repo.save({ ...entity, ...dto });
+    return AddressResponseDto.from(result);
   }
 
   async remove(id: string): Promise<void> {
-    const entity = await this.findById(id);
+    const entity = await this.getEntity(id);
     await this.repo.remove(entity);
   }
 }

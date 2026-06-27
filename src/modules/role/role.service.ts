@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 @Injectable()
 export class RoleService implements OnApplicationBootstrap {
@@ -21,8 +22,12 @@ export class RoleService implements OnApplicationBootstrap {
     }
   }
 
-  findAll(): Promise<Role[]> {
-    return this.repo.find();
+  async findAll(page = 1, perPage = 10): Promise<PaginatedResult<Role>> {
+    const [data, total] = await this.repo.findAndCount({
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data, page, perPage, total };
   }
 
   async findById(id: string): Promise<Role> {

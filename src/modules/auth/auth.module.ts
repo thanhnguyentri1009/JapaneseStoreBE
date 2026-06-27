@@ -9,7 +9,11 @@ import { AUTH_SERVICE } from './interfaces/auth-service.interface';
 import { AccountModule } from '../account/account.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Account, Profile]), JwtModule.register({}), AccountModule],
+  imports: [
+    TypeOrmModule.forFeature([Account, Profile]),
+    JwtModule.register({}),
+    AccountModule,
+  ],
   controllers: [AuthController],
   providers: [{ provide: AUTH_SERVICE, useClass: AuthService }],
 })

@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Inject,
+  Query,
 } from '@nestjs/common';
 import {
   ADDRESS_SERVICE,
@@ -15,6 +16,7 @@ import {
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiBearerAuth()
 @Controller('addresses')
@@ -25,8 +27,8 @@ export class AddressController {
   ) {}
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query() { page, perPage }: PaginationDto) {
+    return this.service.findAll(page, perPage);
   }
 
   @Get('customer/:customerId')

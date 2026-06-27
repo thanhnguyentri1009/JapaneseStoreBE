@@ -1,15 +1,19 @@
-import { Product } from '../../../entities/product.entity';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
+import { ProductResponseDto } from '../dto/product-response.dto';
+import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
 
 export const PRODUCT_SERVICE = Symbol('PRODUCT_SERVICE');
 
 export interface IProductService {
-  findAll(): Promise<Product[]>;
-  findById(id: string): Promise<Product>;
-  findByCategoryId(categoryId: string): Promise<Product[]>;
-  findByBrandId(brandId: string): Promise<Product[]>;
-  create(dto: CreateProductDto): Promise<Product>;
-  update(id: string, dto: UpdateProductDto): Promise<Product>;
+  findAll(
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<ProductResponseDto>>;
+  findById(id: string): Promise<ProductResponseDto>;
+  findByCategoryId(categoryId: string): Promise<ProductResponseDto[]>;
+  findByBrandId(brandId: string): Promise<ProductResponseDto[]>;
+  create(dto: CreateProductDto, imageFilename: string): Promise<ProductResponseDto>;
+  update(id: string, dto: UpdateProductDto, imageFilename?: string): Promise<ProductResponseDto>;
   remove(id: string): Promise<void>;
 }

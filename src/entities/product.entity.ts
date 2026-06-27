@@ -40,6 +40,9 @@ export class Product {
   @Column({ length: 200 })
   name: string;
 
+  @Column({ nullable: true })
+  image: string;
+
   @Index()
   @Column({ length: 50, nullable: true })
   series: string;

@@ -6,8 +6,10 @@ import { Customer } from '../../entities/customer.entity';
 import { IOrderService } from './interfaces/order-service.interface';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrderResponseDto } from './dto/order-response.dto';
 import { OrderGateway } from './order.gateway';
 import { MailService } from '../mail/mail.service';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 @Injectable()
 export class OrderService implements IOrderService {
@@ -20,11 +22,19 @@ export class OrderService implements IOrderService {
     private readonly mailService: MailService,
   ) {}
 
-  findAll(): Promise<Order[]> {
-    return this.repo.find({ relations: ['items', 'payment'] });
+  async findAll(
+    page = 1,
+    perPage = 10,
+  ): Promise<PaginatedResult<OrderResponseDto>> {
+    const [data, total] = await this.repo.findAndCount({
+      relations: ['items', 'payment'],
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data: data.map(OrderResponseDto.from), page, perPage, total };
   }
 
-  async findById(id: string): Promise<Order> {
+  private async getEntity(id: string): Promise<Order> {
     const entity = await this.repo.findOne({
       where: { id },
       relations: ['items', 'items.product', 'payment', 'address'],
@@ -33,14 +43,19 @@ export class OrderService implements IOrderService {
     return entity;
   }
 
-  findByCustomerId(customerId: string): Promise<Order[]> {
-    return this.repo.find({
+  async findById(id: string): Promise<OrderResponseDto> {
+    return OrderResponseDto.from(await this.getEntity(id));
+  }
+
+  async findByCustomerId(customerId: string): Promise<OrderResponseDto[]> {
+    const data = await this.repo.find({
       where: { customerId },
       relations: ['items', 'payment'],
     });
+    return data.map(OrderResponseDto.from);
   }
 
-  async create(dto: CreateOrderDto): Promise<Order> {
+  async create(dto: CreateOrderDto): Promise<OrderResponseDto> {
     const order = await this.repo.save(this.repo.create(dto));
 
     this.gateway.notifyNewOrder(order);
@@ -54,16 +69,17 @@ export class OrderService implements IOrderService {
       }
     }
 
-    return order;
+    return OrderResponseDto.from(order);
   }
 
-  async update(id: string, dto: UpdateOrderDto): Promise<Order> {
-    const entity = await this.findById(id);
-    return this.repo.save({ ...entity, ...dto });
+  async update(id: string, dto: UpdateOrderDto): Promise<OrderResponseDto> {
+    const entity = await this.getEntity(id);
+    const result = await this.repo.save({ ...entity, ...dto });
+    return OrderResponseDto.from(result);
   }
 
   async remove(id: string): Promise<void> {
-    const entity = await this.findById(id);
+    const entity = await this.getEntity(id);
     await this.repo.remove(entity);
   }
 }

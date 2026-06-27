@@ -7,6 +7,7 @@ import {
   Param,
   Body,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import {
@@ -15,6 +16,7 @@ import {
 } from './interfaces/brand-service.interface';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiBearerAuth()
 @Controller('brands')
@@ -22,8 +24,8 @@ export class BrandController {
   constructor(@Inject(BRAND_SERVICE) private readonly service: IBrandService) {}
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query() { page, perPage }: PaginationDto) {
+    return this.service.findAll(page, perPage);
   }
 
   @Get(':id')

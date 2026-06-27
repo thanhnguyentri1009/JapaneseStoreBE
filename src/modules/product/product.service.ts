@@ -7,8 +7,10 @@ import { Product } from '../../entities/product.entity';
 import { IProductService } from './interfaces/product-service.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductResponseDto } from './dto/product-response.dto';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
-const RELATIONS = ['category', 'brand'];
+const RELATIONS = ['category', 'brand', 'detail'];
 
 @Injectable()
 export class ProductService implements IProductService {
@@ -20,26 +22,19 @@ export class ProductService implements IProductService {
     private readonly repo: Repository<Product>,
   ) {}
 
-  async findAll(): Promise<Product[]> {
-    try {
-      const cached = await this.cache.get<Product[]>('products');
-      if (cached) return cached;
-    } catch (error) {
-      this.logger.error('Cache get failed for products', error);
-    }
-
-    const data = await this.repo.find({ relations: RELATIONS });
-
-    try {
-      await this.cache.set('products', data);
-    } catch (error) {
-      this.logger.error('Cache set failed for products', error);
-    }
-
-    return data;
+  async findAll(
+    page = 1,
+    perPage = 10,
+  ): Promise<PaginatedResult<ProductResponseDto>> {
+    const [data, total] = await this.repo.findAndCount({
+      relations: RELATIONS,
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data: data.map(ProductResponseDto.from), page, perPage, total };
   }
 
-  async findById(id: string): Promise<Product> {
+  private async getEntity(id: string): Promise<Product> {
     try {
       const cached = await this.cache.get<Product>(`product:${id}`);
       if (cached) return cached;
@@ -62,12 +57,16 @@ export class ProductService implements IProductService {
     return entity;
   }
 
-  async findByCategoryId(categoryId: string): Promise<Product[]> {
+  async findById(id: string): Promise<ProductResponseDto> {
+    return ProductResponseDto.from(await this.getEntity(id));
+  }
+
+  async findByCategoryId(categoryId: string): Promise<ProductResponseDto[]> {
     try {
       const cached = await this.cache.get<Product[]>(
         `products:category:${categoryId}`,
       );
-      if (cached) return cached;
+      if (cached) return cached.map(ProductResponseDto.from);
     } catch (error) {
       this.logger.error(
         `Cache get failed for products:category:${categoryId}`,
@@ -89,15 +88,15 @@ export class ProductService implements IProductService {
       );
     }
 
-    return data;
+    return data.map(ProductResponseDto.from);
   }
 
-  async findByBrandId(brandId: string): Promise<Product[]> {
+  async findByBrandId(brandId: string): Promise<ProductResponseDto[]> {
     try {
       const cached = await this.cache.get<Product[]>(
         `products:brand:${brandId}`,
       );
-      if (cached) return cached;
+      if (cached) return cached.map(ProductResponseDto.from);
     } catch (error) {
       this.logger.error(
         `Cache get failed for products:brand:${brandId}`,
@@ -119,11 +118,15 @@ export class ProductService implements IProductService {
       );
     }
 
-    return data;
+    return data.map(ProductResponseDto.from);
   }
 
-  async create(dto: CreateProductDto): Promise<Product> {
-    const result = await this.repo.save(this.repo.create(dto));
+  async create(
+    dto: CreateProductDto,
+    imageFilename: string,
+  ): Promise<ProductResponseDto> {
+    const image = `/uploads/${imageFilename}`;
+    const result = await this.repo.save(this.repo.create({ ...dto, image }));
     try {
       await this.cache.del('products');
       if (dto.categoryId)
@@ -132,12 +135,21 @@ export class ProductService implements IProductService {
     } catch (error) {
       this.logger.error('Cache del failed after product create', error);
     }
-    return result;
+    return ProductResponseDto.from(result);
   }
 
-  async update(id: string, dto: UpdateProductDto): Promise<Product> {
-    const entity = await this.findById(id);
-    const result = await this.repo.save({ ...entity, ...dto });
+  async update(
+    id: string,
+    dto: UpdateProductDto,
+    imageFilename?: string,
+  ): Promise<ProductResponseDto> {
+    const entity = await this.getEntity(id);
+    const image = imageFilename ? `/uploads/${imageFilename}` : undefined;
+    const result = await this.repo.save({
+      ...entity,
+      ...dto,
+      ...(image ? { image } : {}),
+    });
     try {
       await this.cache.del('products');
       await this.cache.del(`product:${id}`);
@@ -152,11 +164,11 @@ export class ProductService implements IProductService {
     } catch (error) {
       this.logger.error(`Cache del failed after product:${id} update`, error);
     }
-    return result;
+    return ProductResponseDto.from(result);
   }
 
   async remove(id: string): Promise<void> {
-    const entity = await this.findById(id);
+    const entity = await this.getEntity(id);
     await this.repo.remove(entity);
     try {
       await this.cache.del('products');

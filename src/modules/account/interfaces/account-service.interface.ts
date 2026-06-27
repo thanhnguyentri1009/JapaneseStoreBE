@@ -1,16 +1,17 @@
-import { Account } from '../../../entities/account.entity';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { UpdateAccountDto } from '../dto/update-account.dto';
-import { ChangeRoleDto } from '../dto/change-role.dto';
+import { AccountResponseDto } from '../dto/account-response.dto';
+import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
 
 export const ACCOUNT_SERVICE = 'ACCOUNT_SERVICE';
 
-export type SafeAccount = Omit<Account, 'password' | 'refresh_token'>;
-
 export interface IAccountService {
-  findAll(): Promise<SafeAccount[]>;
-  findById(id: string): Promise<SafeAccount>;
-  create(dto: CreateAccountDto): Promise<SafeAccount>;
-  update(id: string, dto: UpdateAccountDto): Promise<SafeAccount>;
+  findAll(
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<AccountResponseDto>>;
+  findById(id: string): Promise<AccountResponseDto>;
+  create(dto: CreateAccountDto): Promise<AccountResponseDto>;
+  update(id: string, dto: UpdateAccountDto): Promise<AccountResponseDto>;
   remove(id: string): Promise<void>;
 }

@@ -7,6 +7,9 @@ import {
   Param,
   Body,
   Inject,
+  Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ACCOUNT_SERVICE,
@@ -16,6 +19,7 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 @ApiBearerAuth()
 @Controller('accounts')
@@ -26,8 +30,8 @@ export class AccountController {
   ) {}
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  findAll(@Query() { page, perPage }: PaginationDto) {
+    return this.service.findAll(page, perPage);
   }
 
   @Get(':id')
@@ -46,6 +50,7 @@ export class AccountController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.service.remove(id);
   }

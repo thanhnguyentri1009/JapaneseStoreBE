@@ -7,14 +7,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Account } from '../../entities/account.entity';
+import { Profile } from '../../entities/profile.entity';
 import { RoleService } from '../role/role.service';
-import {
-  IAccountService,
-  SafeAccount,
-} from './interfaces/account-service.interface';
+import { IAccountService } from './interfaces/account-service.interface';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { ChangeRoleDto } from './dto/change-role.dto';
+import { AccountResponseDto } from './dto/account-response.dto';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 const SALT_ROUNDS = 10;
 
@@ -23,26 +22,29 @@ export class AccountService implements IAccountService {
   constructor(
     @InjectRepository(Account)
     private readonly repo: Repository<Account>,
+    @InjectRepository(Profile)
+    private readonly profileRepo: Repository<Profile>,
     private readonly roleService: RoleService,
   ) {}
 
-  private omit(account: Account): SafeAccount {
-    const { password, refresh_token, ...rest } = account;
-    return rest;
+  async findAll(
+    page = 1,
+    perPage = 10,
+  ): Promise<PaginatedResult<AccountResponseDto>> {
+    const [data, total] = await this.repo.findAndCount({
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data: data.map(AccountResponseDto.from), page, perPage, total };
   }
 
-  async findAll(): Promise<SafeAccount[]> {
-    const data = await this.repo.find();
-    return data.map((a) => this.omit(a));
-  }
-
-  async findById(id: string): Promise<SafeAccount> {
+  async findById(id: string): Promise<AccountResponseDto> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
-    return this.omit(entity);
+    return AccountResponseDto.from(entity);
   }
 
-  async create(dto: CreateAccountDto): Promise<SafeAccount> {
+  async create(dto: CreateAccountDto): Promise<AccountResponseDto> {
     const existing = await this.repo.findOne({
       where: { username: dto.username },
     });
@@ -50,17 +52,20 @@ export class AccountService implements IAccountService {
       throw new ConflictException(`Username "${dto.username}" already taken`);
 
     const hashed = await bcrypt.hash(dto.password, SALT_ROUNDS);
-    const defaultRole = await this.roleService.findByName('user');
+    const role = dto.roleId
+      ? await this.roleService.findById(dto.roleId)
+      : await this.roleService.findByName('user');
+    const { roleId: _, ...rest } = dto;
     const entity = this.repo.create({
-      ...dto,
+      ...rest,
       password: hashed,
-      role: defaultRole,
+      role,
     });
     const saved = await this.repo.save(entity);
-    return this.omit(saved);
+    return AccountResponseDto.from(saved);
   }
 
-  async update(id: string, dto: UpdateAccountDto): Promise<SafeAccount> {
+  async update(id: string, dto: UpdateAccountDto): Promise<AccountResponseDto> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
 
@@ -69,12 +74,18 @@ export class AccountService implements IAccountService {
     }
 
     const saved = await this.repo.save({ ...entity, ...dto });
-    return this.omit(saved);
+    return AccountResponseDto.from(saved);
   }
 
   async remove(id: string): Promise<void> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Account #${id} not found`);
+
+    const profile = await this.profileRepo.findOne({
+      where: { accountId: id },
+    });
+    if (profile) await this.profileRepo.remove(profile);
+
     await this.repo.remove(entity);
   }
 }

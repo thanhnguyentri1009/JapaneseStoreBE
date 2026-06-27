@@ -5,6 +5,8 @@ import { Payment } from '../../entities/payment.entity';
 import { IPaymentService } from './interfaces/payment-service.interface';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { PaymentResponseDto } from './dto/payment-response.dto';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
 
 @Injectable()
 export class PaymentService implements IPaymentService {
@@ -13,34 +15,47 @@ export class PaymentService implements IPaymentService {
     private readonly repo: Repository<Payment>,
   ) {}
 
-  findAll(): Promise<Payment[]> {
-    return this.repo.find();
+  async findAll(
+    page = 1,
+    perPage = 10,
+  ): Promise<PaginatedResult<PaymentResponseDto>> {
+    const [data, total] = await this.repo.findAndCount({
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    return { data: data.map(PaymentResponseDto.from), page, perPage, total };
   }
 
-  async findById(id: string): Promise<Payment> {
+  private async getEntity(id: string): Promise<Payment> {
     const entity = await this.repo.findOne({ where: { id } });
     if (!entity) throw new NotFoundException(`Payment #${id} not found`);
     return entity;
   }
 
-  async findByOrderId(orderId: string): Promise<Payment> {
+  async findById(id: string): Promise<PaymentResponseDto> {
+    return PaymentResponseDto.from(await this.getEntity(id));
+  }
+
+  async findByOrderId(orderId: string): Promise<PaymentResponseDto> {
     const entity = await this.repo.findOne({ where: { orderId } });
     if (!entity)
       throw new NotFoundException(`Payment for Order #${orderId} not found`);
-    return entity;
+    return PaymentResponseDto.from(entity);
   }
 
-  create(dto: CreatePaymentDto): Promise<Payment> {
-    return this.repo.save(this.repo.create(dto));
+  async create(dto: CreatePaymentDto): Promise<PaymentResponseDto> {
+    const result = await this.repo.save(this.repo.create(dto));
+    return PaymentResponseDto.from(result);
   }
 
-  async update(id: string, dto: UpdatePaymentDto): Promise<Payment> {
-    const entity = await this.findById(id);
-    return this.repo.save({ ...entity, ...dto });
+  async update(id: string, dto: UpdatePaymentDto): Promise<PaymentResponseDto> {
+    const entity = await this.getEntity(id);
+    const result = await this.repo.save({ ...entity, ...dto });
+    return PaymentResponseDto.from(result);
   }
 
   async remove(id: string): Promise<void> {
-    const entity = await this.findById(id);
+    const entity = await this.getEntity(id);
     await this.repo.remove(entity);
   }
 }
