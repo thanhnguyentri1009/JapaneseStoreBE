@@ -18,7 +18,6 @@ import {
 import { AccountResponseDto } from '../account/dto/account-response.dto';
 import { IAuthService, TokenPair } from './interfaces/auth-service.interface';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateAccountDto } from '../account/dto/create-account.dto';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../../utils';
 
@@ -84,10 +83,10 @@ export class AuthService implements IAuthService {
     return tokens;
   }
 
-  async refresh(dto: RefreshTokenDto): Promise<TokenPair> {
+  async refresh(refreshToken: string): Promise<TokenPair> {
     let payload: any;
     try {
-      payload = this.jwtService.verify(dto.refresh_token, {
+      payload = this.jwtService.verify(refreshToken, {
         secret: this.config.get(REFRESH_TOKEN),
       });
     } catch {
@@ -95,7 +94,7 @@ export class AuthService implements IAuthService {
     }
 
     const entity = await this.repo.findOne({ where: { id: payload.sub } });
-    if (!entity || entity.refresh_token !== dto.refresh_token) {
+    if (!entity || entity.refresh_token !== refreshToken) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
