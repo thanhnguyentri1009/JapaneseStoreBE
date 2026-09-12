@@ -52,4 +52,9 @@ export class RoleService implements OnApplicationBootstrap {
     const role = await this.findById(id);
     return this.repo.save({ ...role, ...dto });
   }
+
+  async remove(id: string): Promise<void> {
+    const role = await this.findById(id);
+    await this.repo.remove(role);
+  }
 }

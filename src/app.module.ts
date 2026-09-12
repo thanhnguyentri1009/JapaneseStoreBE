@@ -18,6 +18,7 @@ import { RoleModule } from './modules/role/role.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BrandModule } from './modules/brand/brand.module';
 import { ProfileModule } from './modules/profile/profile.module';
+import { StorageModule } from './modules/storage/storage.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 
@@ -70,6 +71,7 @@ import { redisStore } from 'cache-manager-redis-yet';
     AuthModule,
     BrandModule,
     ProfileModule,
+    StorageModule,
     JwtModule.register({}),
   ],
   providers: [

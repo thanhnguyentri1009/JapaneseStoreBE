@@ -34,6 +34,7 @@
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/typeorm": "^11.0.1",
     "@nestjs/websockets": "^11.1.26",
+    "@supabase/supabase-js": "^2.116.0",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "cache-manager": "^7.2.8",

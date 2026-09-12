@@ -30,6 +30,10 @@ export class CreateProductDto {
   @IsString()
   series?: string;
 
+  @ApiProperty()
+  @IsString()
+  image: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

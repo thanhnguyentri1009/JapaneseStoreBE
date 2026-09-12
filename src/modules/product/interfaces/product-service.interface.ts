@@ -13,7 +13,7 @@ export interface IProductService {
   findById(id: string): Promise<ProductResponseDto>;
   findByCategoryId(categoryId: string): Promise<ProductResponseDto[]>;
   findByBrandId(brandId: string): Promise<ProductResponseDto[]>;
-  create(dto: CreateProductDto, imageFilename: string): Promise<ProductResponseDto>;
-  update(id: string, dto: UpdateProductDto, imageFilename?: string): Promise<ProductResponseDto>;
+  create(dto: CreateProductDto): Promise<ProductResponseDto>;
+  update(id: string, dto: UpdateProductDto): Promise<ProductResponseDto>;
   remove(id: string): Promise<void>;
 }

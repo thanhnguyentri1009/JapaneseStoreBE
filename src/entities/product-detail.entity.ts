@@ -32,6 +32,9 @@ export class ProductDetail {
   @Column({ default: 0 })
   stock: number;
 
+  @Column({ name: 'color_count', nullable: true })
+  colorCount: number;
+
   @Index()
   @Column({ name: 'is_active', default: true })
   isActive: boolean;

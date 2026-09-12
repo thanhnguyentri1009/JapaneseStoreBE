@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -36,5 +37,10 @@ export class RoleController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
     return this.service.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.service.remove(id);
   }
 }

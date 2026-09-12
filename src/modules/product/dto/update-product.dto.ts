@@ -34,6 +34,11 @@ export class UpdateProductDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  image?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   nibType?: string;
 
   @ApiPropertyOptional()
