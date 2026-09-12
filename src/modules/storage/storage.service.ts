@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { extname } from 'path';
+import WebSocket from 'ws';
 
 @Injectable()
 export class StorageService implements OnModuleInit {
@@ -18,6 +19,13 @@ export class StorageService implements OnModuleInit {
     this.client = createClient(
       this.config.get('SUPABASE_URL'),
       this.config.get('SUPABASE_SERVICE_ROLE_KEY'),
+      {
+        auth: { persistSession: false, autoRefreshToken: false },
+        // Supabase's Realtime client resolves a WebSocket constructor eagerly on
+        // creation; some Node runtimes don't expose a native global `WebSocket`,
+        // which crashes createClient() even though this service never uses Realtime.
+        realtime: { transport: WebSocket as any },
+      },
     );
     this.bucket = this.config.get('SUPABASE_STORAGE_BUCKET', 'product-images');
   }
