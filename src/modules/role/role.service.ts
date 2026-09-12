@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import { CreateRoleDto } from './dto/create-role.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Injectable()
 export class RoleService implements OnApplicationBootstrap {
@@ -40,5 +42,14 @@ export class RoleService implements OnApplicationBootstrap {
     const role = await this.repo.findOne({ where: { name } });
     if (!role) throw new NotFoundException(`Role "${name}" not found`);
     return role;
+  }
+
+  async create(dto: CreateRoleDto): Promise<Role> {
+    return this.repo.save(this.repo.create(dto));
+  }
+
+  async update(id: string, dto: UpdateRoleDto): Promise<Role> {
+    const role = await this.findById(id);
+    return this.repo.save({ ...role, ...dto });
   }
 }
