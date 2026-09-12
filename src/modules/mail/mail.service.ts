@@ -14,7 +14,7 @@ export class MailService {
 
   async sendOrderConfirmation(email: string, order: Order): Promise<void> {
     try {
-      await this.resend.emails.send({
+      const { error } = await this.resend.emails.send({
         from: this.config.get('MAIL_FROM', 'noreply@japanesestore.com'),
         to: email,
         subject: `Đặt hàng thành công - Mã đơn #${order.id.slice(0, 8).toUpperCase()}`,
@@ -26,6 +26,13 @@ export class MailService {
           <p>Chúng tôi sẽ liên hệ với bạn sớm nhất.</p>
         `,
       });
+      // resend never throws for API-level failures (e.g. quota exceeded) —
+      // it always resolves with { error }, so this must be checked explicitly.
+      if (error) {
+        this.logger.error(
+          `Failed to send order confirmation to ${email}: [${error.name}] ${error.message}`,
+        );
+      }
     } catch (err) {
       this.logger.error(`Failed to send order confirmation to ${email}`, err);
     }
