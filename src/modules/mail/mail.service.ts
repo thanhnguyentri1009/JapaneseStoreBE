@@ -1,27 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { Order } from '../../entities/order.entity';
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private transporter: nodemailer.Transporter;
+  private readonly resend: Resend;
 
   constructor(private readonly config: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: config.get('MAIL_HOST'),
-      port: config.get<number>('MAIL_PORT', 587),
-      auth: {
-        user: config.get('MAIL_USER'),
-        pass: config.get('MAIL_PASS'),
-      },
-    });
+    this.resend = new Resend(config.get('RESEND_API_KEY'));
   }
 
   async sendOrderConfirmation(email: string, order: Order): Promise<void> {
     try {
-      await this.transporter.sendMail({
+      await this.resend.emails.send({
         from: this.config.get('MAIL_FROM', 'noreply@japanesestore.com'),
         to: email,
         subject: `Đặt hàng thành công - Mã đơn #${order.id.slice(0, 8).toUpperCase()}`,

@@ -32,7 +32,9 @@ import { redisStore } from 'cache-manager-redis-yet';
           socket: {
             host: process.env.REDIS_HOST ?? 'localhost',
             port: parseInt(process.env.REDIS_PORT ?? '6379'),
+            tls: process.env.REDIS_SSL === 'true',
           },
+          password: process.env.REDIS_PASSWORD,
           ttl: 60 * 1000,
         }),
       }),
@@ -50,6 +52,10 @@ import { redisStore } from 'cache-manager-redis-yet';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: config.get('NODE_ENV') !== 'production',
         logging: config.get('NODE_ENV') === 'development',
+        ssl:
+          config.get('DB_SSL') === 'true'
+            ? { rejectUnauthorized: false }
+            : false,
       }),
     }),
     CategoryModule,
