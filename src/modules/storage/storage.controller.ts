@@ -26,7 +26,7 @@ export class StorageController {
         image: {
           type: 'string',
           format: 'binary',
-          description: 'Image file (jpg/png/gif/webp, max 5MB)',
+          description: 'Image file (jpg/png, max 2MB)',
         },
       },
     },
