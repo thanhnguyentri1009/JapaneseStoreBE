@@ -28,7 +28,7 @@ export class CustomerService implements ICustomerService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(CustomerResponseDto.from), page, perPage, total };
+    return { items: data.map(CustomerResponseDto.from), page, perPage, total };
   }
 
   private async getEntity(id: string): Promise<Customer> {

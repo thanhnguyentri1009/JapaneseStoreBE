@@ -22,6 +22,12 @@ export class Profile {
   @Column({ name: 'full_name', length: 100 })
   fullName: string;
 
+  @Column({ length: 100 })
+  username: string;
+
+  @Column({ length: 200 })
+  email: string;
+
   @Column({ length: 20, nullable: true })
   phone: string;
 

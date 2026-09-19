@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Account } from './account.entity';
 import { Address } from './address.entity';
 import { Order } from './order.entity';
 
@@ -13,7 +16,14 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 150 })
+  @OneToOne(() => Account, { nullable: true })
+  @JoinColumn({ name: 'account_id' })
+  account: Account;
+
+  @Column({ name: 'account_id', type: 'uuid', nullable: true, unique: true })
+  accountId: string;
+
+  @Column({ length: 150, nullable: true })
   name: string;
 
   @Column({ length: 150, unique: true })
@@ -21,6 +31,9 @@ export class Customer {
 
   @Column({ length: 20, nullable: true })
   phone: string;
+
+  @Column({ name: 'is_registered', default: false })
+  isRegistered: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

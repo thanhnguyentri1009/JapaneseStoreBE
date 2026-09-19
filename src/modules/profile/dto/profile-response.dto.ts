@@ -10,6 +10,12 @@ export class ProfileResponseDto {
   @ApiProperty()
   fullName: string;
 
+  @ApiProperty()
+  username: string;
+
+  @ApiProperty()
+  email: string;
+
   @ApiPropertyOptional()
   phone: string;
 
@@ -25,6 +31,8 @@ export class ProfileResponseDto {
     dto.id = entity.id;
     dto.accountId = entity.accountId;
     dto.fullName = entity.fullName;
+    dto.username = entity.username;
+    dto.email = entity.email;
     dto.phone = entity.phone;
     dto.address = entity.address;
     dto.img = entity.img;

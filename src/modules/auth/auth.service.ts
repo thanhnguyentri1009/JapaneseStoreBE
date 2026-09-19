@@ -62,8 +62,11 @@ export class AuthService implements IAuthService {
       this.profileRepo.create({
         accountId: account.id,
         fullName: dto.username,
+        username: account.username,
+        email: account.email,
       }),
     );
+
     return account;
   }
 
