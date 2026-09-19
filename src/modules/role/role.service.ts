@@ -29,7 +29,7 @@ export class RoleService implements OnApplicationBootstrap {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data, page, perPage, total };
+    return { items: data, page, perPage, total };
   }
 
   async findById(id: string): Promise<Role> {

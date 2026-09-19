@@ -34,7 +34,7 @@ export class ProductService implements IProductService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(ProductResponseDto.from), page, perPage, total };
+    return { items: data.map(ProductResponseDto.from), page, perPage, total };
   }
 
   private async getEntity(id: string): Promise<Product> {

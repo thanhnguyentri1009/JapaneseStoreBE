@@ -35,7 +35,7 @@ export class AccountService implements IAccountService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(AccountResponseDto.from), page, perPage, total };
+    return { items: data.map(AccountResponseDto.from), page, perPage, total };
   }
 
   async findById(id: string): Promise<AccountResponseDto> {

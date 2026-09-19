@@ -26,7 +26,7 @@ export class AddressService implements IAddressService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(AddressResponseDto.from), page, perPage, total };
+    return { items: data.map(AddressResponseDto.from), page, perPage, total };
   }
 
   private async getEntity(id: string): Promise<Address> {

@@ -28,7 +28,7 @@ export class CategoryService implements ICategoryService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(CategoryResponseDto.from), page, perPage, total };
+    return { items: data.map(CategoryResponseDto.from), page, perPage, total };
   }
 
   private async getEntity(id: string): Promise<Category> {

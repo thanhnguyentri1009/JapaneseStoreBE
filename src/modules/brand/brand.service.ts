@@ -23,7 +23,7 @@ export class BrandService implements IBrandService {
       skip: (page - 1) * perPage,
       take: perPage,
     });
-    return { data: data.map(BrandResponseDto.from), page, perPage, total };
+    return { items: data.map(BrandResponseDto.from), page, perPage, total };
   }
 
   private async getEntity(id: string): Promise<Brand> {
