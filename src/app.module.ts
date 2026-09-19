@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
@@ -19,6 +21,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BrandModule } from './modules/brand/brand.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { CheckoutModule } from './modules/checkout/checkout.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 
@@ -72,11 +75,14 @@ import { redisStore } from 'cache-manager-redis-yet';
     BrandModule,
     ProfileModule,
     StorageModule,
+    CheckoutModule,
     JwtModule.register({}),
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
   ],
 })
 export class AppModule {}

@@ -17,6 +17,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiBearerAuth()
 @Controller('categories')
@@ -26,11 +27,13 @@ export class CategoryController {
     private readonly service: ICategoryService,
   ) {}
 
+  @Public()
   @Get()
   findAll(@Query() { page, perPage }: PaginationDto) {
     return this.service.findAll(page, perPage);
   }
 
+  @Public()
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.service.findById(id);

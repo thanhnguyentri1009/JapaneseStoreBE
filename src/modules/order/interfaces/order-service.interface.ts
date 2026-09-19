@@ -15,4 +15,17 @@ export interface IOrderService {
   create(dto: CreateOrderDto): Promise<OrderResponseDto>;
   update(id: string, dto: UpdateOrderDto): Promise<OrderResponseDto>;
   remove(id: string): Promise<void>;
+
+  // Scoped variants used when the caller isn't an admin — restrict results
+  // to orders belonging to the customer linked to their own account.
+  findAllForAccount(
+    accountId: string,
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<OrderResponseDto>>;
+  findByIdForAccount(id: string, accountId: string): Promise<OrderResponseDto>;
+  findByCustomerIdForAccount(
+    customerId: string,
+    accountId: string,
+  ): Promise<OrderResponseDto[]>;
 }

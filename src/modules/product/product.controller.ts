@@ -17,6 +17,7 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiBearerAuth()
 @Controller('products')
@@ -26,21 +27,25 @@ export class ProductController {
     private readonly service: IProductService,
   ) {}
 
+  @Public()
   @Get()
   findAll(@Query() { page, perPage }: PaginationDto) {
     return this.service.findAll(page, perPage);
   }
 
+  @Public()
   @Get('category/:categoryId')
   findByCategoryId(@Param('categoryId') categoryId: string) {
     return this.service.findByCategoryId(categoryId);
   }
 
+  @Public()
   @Get('brand/:brandId')
   findByBrandId(@Param('brandId') brandId: string) {
     return this.service.findByBrandId(brandId);
   }
 
+  @Public()
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.service.findById(id);

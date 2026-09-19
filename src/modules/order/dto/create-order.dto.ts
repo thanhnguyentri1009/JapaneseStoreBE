@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
+import { IsEnum, IsOptional, IsUUID } from 'class-validator';
 import { OrderStatus } from '../../../entities/order.entity';
 
 export class CreateOrderDto {
@@ -12,9 +12,4 @@ export class CreateOrderDto {
   @IsOptional()
   @IsEnum(OrderStatus)
   status?: OrderStatus;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  totalAmount?: number;
 }

@@ -1,4 +1,4 @@
-import { IsInt, IsNumber, IsUUID, Min } from 'class-validator';
+import { IsInt, IsUUID, Min } from 'class-validator';
 
 export class CreateOrderItemDto {
   @IsUUID()
@@ -10,8 +10,4 @@ export class CreateOrderItemDto {
   @IsInt()
   @Min(1)
   quantity: number;
-
-  @IsNumber()
-  @Min(0)
-  unitPrice: number;
 }

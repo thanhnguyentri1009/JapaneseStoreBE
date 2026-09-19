@@ -15,4 +15,20 @@ export interface IPaymentService {
   create(dto: CreatePaymentDto): Promise<PaymentResponseDto>;
   update(id: string, dto: UpdatePaymentDto): Promise<PaymentResponseDto>;
   remove(id: string): Promise<void>;
+
+  // Scoped variants used when the caller isn't an admin — restrict results
+  // to payments whose order belongs to the customer linked to their own account.
+  findAllForAccount(
+    accountId: string,
+    page: number,
+    perPage: number,
+  ): Promise<PaginatedResult<PaymentResponseDto>>;
+  findByIdForAccount(
+    id: string,
+    accountId: string,
+  ): Promise<PaymentResponseDto>;
+  findByOrderIdForAccount(
+    orderId: string,
+    accountId: string,
+  ): Promise<PaymentResponseDto>;
 }

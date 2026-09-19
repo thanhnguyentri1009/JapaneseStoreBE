@@ -17,17 +17,20 @@ import {
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiBearerAuth()
 @Controller('brands')
 export class BrandController {
   constructor(@Inject(BRAND_SERVICE) private readonly service: IBrandService) {}
 
+  @Public()
   @Get()
   findAll(@Query() { page, perPage }: PaginationDto) {
     return this.service.findAll(page, perPage);
   }
 
+  @Public()
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.service.findById(id);
