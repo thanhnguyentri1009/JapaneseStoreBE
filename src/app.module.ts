@@ -28,7 +28,7 @@ import { redisStore } from 'cache-manager-redis-yet';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 20 }]),
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: async () => ({
