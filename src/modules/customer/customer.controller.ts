@@ -16,7 +16,7 @@ import {
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { SearchPaginationDto } from '../../common/dto/search-pagination.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
@@ -29,8 +29,8 @@ export class CustomerController {
   ) {}
 
   @Get()
-  findAll(@Query() { page, perPage }: PaginationDto) {
-    return this.service.findAll(page, perPage);
+  findAll(@Query() { page, perPage, searchText }: SearchPaginationDto) {
+    return this.service.findAll(page, perPage, searchText);
   }
 
   @Get('email/:email')

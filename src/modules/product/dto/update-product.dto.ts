@@ -46,12 +46,14 @@ export class UpdateProductDto {
   @IsString()
   inkType?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Number of colors included in this product set (e.g. 70, 150)',
+  })
   @IsOptional()
   @Transform(({ value }) => (value !== undefined ? parseInt(value, 10) : value))
   @IsInt()
   @Min(1)
-  colorCount?: number;
+  size?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

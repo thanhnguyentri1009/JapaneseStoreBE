@@ -16,7 +16,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { SearchPaginationDto } from '../../common/dto/search-pagination.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -30,8 +30,8 @@ export class CategoryController {
 
   @Public()
   @Get()
-  findAll(@Query() { page, perPage }: PaginationDto) {
-    return this.service.findAll(page, perPage);
+  findAll(@Query() { page, perPage, searchText }: SearchPaginationDto) {
+    return this.service.findAll(page, perPage, searchText);
   }
 
   @Public()

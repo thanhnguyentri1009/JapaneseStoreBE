@@ -9,6 +9,7 @@ export interface IAccountService {
   findAll(
     page: number,
     perPage: number,
+    searchText?: string,
   ): Promise<PaginatedResult<AccountResponseDto>>;
   findById(id: string): Promise<AccountResponseDto>;
   create(dto: CreateAccountDto): Promise<AccountResponseDto>;

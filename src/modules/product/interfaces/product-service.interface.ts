@@ -9,10 +9,20 @@ export interface IProductService {
   findAll(
     page: number,
     perPage: number,
+    searchText?: string,
+    size?: number,
   ): Promise<PaginatedResult<ProductResponseDto>>;
   findById(id: string): Promise<ProductResponseDto>;
-  findByCategoryId(categoryId: string): Promise<ProductResponseDto[]>;
-  findByBrandId(brandId: string): Promise<ProductResponseDto[]>;
+  findByCategoryId(
+    categoryId: string,
+    searchText?: string,
+    size?: number,
+  ): Promise<ProductResponseDto[]>;
+  findByBrandId(
+    brandId: string,
+    searchText?: string,
+    size?: number,
+  ): Promise<ProductResponseDto[]>;
   create(dto: CreateProductDto): Promise<ProductResponseDto>;
   update(id: string, dto: UpdateProductDto): Promise<ProductResponseDto>;
   remove(id: string): Promise<void>;

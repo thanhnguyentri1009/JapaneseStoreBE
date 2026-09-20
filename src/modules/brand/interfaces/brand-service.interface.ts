@@ -9,6 +9,7 @@ export interface IBrandService {
   findAll(
     page: number,
     perPage: number,
+    searchText?: string,
   ): Promise<PaginatedResult<BrandResponseDto>>;
   findById(id: string): Promise<BrandResponseDto>;
   create(dto: CreateBrandDto): Promise<BrandResponseDto>;

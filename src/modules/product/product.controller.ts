@@ -16,7 +16,7 @@ import {
 } from './interfaces/product-service.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { ProductQueryDto } from './dto/product-query.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -30,20 +30,26 @@ export class ProductController {
 
   @Public()
   @Get()
-  findAll(@Query() { page, perPage }: PaginationDto) {
-    return this.service.findAll(page, perPage);
+  findAll(@Query() { page, perPage, searchText, size }: ProductQueryDto) {
+    return this.service.findAll(page, perPage, searchText, size);
   }
 
   @Public()
   @Get('category/:categoryId')
-  findByCategoryId(@Param('categoryId') categoryId: string) {
-    return this.service.findByCategoryId(categoryId);
+  findByCategoryId(
+    @Param('categoryId') categoryId: string,
+    @Query() { searchText, size }: ProductQueryDto,
+  ) {
+    return this.service.findByCategoryId(categoryId, searchText, size);
   }
 
   @Public()
   @Get('brand/:brandId')
-  findByBrandId(@Param('brandId') brandId: string) {
-    return this.service.findByBrandId(brandId);
+  findByBrandId(
+    @Param('brandId') brandId: string,
+    @Query() { searchText, size }: ProductQueryDto,
+  ) {
+    return this.service.findByBrandId(brandId, searchText, size);
   }
 
   @Public()

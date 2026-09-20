@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Customer } from '../../entities/customer.entity';
@@ -23,8 +23,10 @@ export class CustomerService implements ICustomerService {
   async findAll(
     page = 1,
     perPage = 10,
+    searchText?: string,
   ): Promise<PaginatedResult<CustomerResponseDto>> {
     const [data, total] = await this.repo.findAndCount({
+      where: searchText ? { name: ILike(`%${searchText}%`) } : {},
       skip: (page - 1) * perPage,
       take: perPage,
     });

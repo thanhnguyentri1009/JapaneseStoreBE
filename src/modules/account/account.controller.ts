@@ -19,7 +19,7 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PaginationDto } from '../../common/dto/pagination.dto';
+import { SearchPaginationDto } from '../../common/dto/search-pagination.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
@@ -32,8 +32,8 @@ export class AccountController {
   ) {}
 
   @Get()
-  findAll(@Query() { page, perPage }: PaginationDto) {
-    return this.service.findAll(page, perPage);
+  findAll(@Query() { page, perPage, searchText }: SearchPaginationDto) {
+    return this.service.findAll(page, perPage, searchText);
   }
 
   @Get(':id')

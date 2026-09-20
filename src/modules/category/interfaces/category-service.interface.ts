@@ -9,6 +9,7 @@ export interface ICategoryService {
   findAll(
     page: number,
     perPage: number,
+    searchText?: string,
   ): Promise<PaginatedResult<CategoryResponseDto>>;
   findById(id: string): Promise<CategoryResponseDto>;
   create(dto: CreateCategoryDto): Promise<CategoryResponseDto>;

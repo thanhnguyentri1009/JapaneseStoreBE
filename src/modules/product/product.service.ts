@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { Product } from '../../entities/product.entity';
@@ -25,11 +25,24 @@ export class ProductService implements IProductService {
     private readonly detailRepo: Repository<ProductDetail>,
   ) {}
 
+  private buildWhere(
+    searchText?: string,
+    size?: number,
+  ): FindOptionsWhere<Product> {
+    const where: FindOptionsWhere<Product> = {};
+    if (searchText) where.name = ILike(`%${searchText}%`);
+    if (size) where.detail = { size };
+    return where;
+  }
+
   async findAll(
     page = 1,
     perPage = 10,
+    searchText?: string,
+    size?: number,
   ): Promise<PaginatedResult<ProductResponseDto>> {
     const [data, total] = await this.repo.findAndCount({
+      where: this.buildWhere(searchText, size),
       relations: RELATIONS,
       skip: (page - 1) * perPage,
       take: perPage,
@@ -64,68 +77,74 @@ export class ProductService implements IProductService {
     return ProductResponseDto.from(await this.getEntity(id));
   }
 
-  async findByCategoryId(categoryId: string): Promise<ProductResponseDto[]> {
-    try {
-      const cached = await this.cache.get<Product[]>(
-        `products:category:${categoryId}`,
-      );
-      if (cached) return cached.map(ProductResponseDto.from);
-    } catch (error) {
-      this.logger.error(
-        `Cache get failed for products:category:${categoryId}`,
-        error,
-      );
+  async findByCategoryId(
+    categoryId: string,
+    searchText?: string,
+    size?: number,
+  ): Promise<ProductResponseDto[]> {
+    const isFiltered = Boolean(searchText || size);
+    const cacheKey = `products:category:${categoryId}`;
+
+    if (!isFiltered) {
+      try {
+        const cached = await this.cache.get<Product[]>(cacheKey);
+        if (cached) return cached.map(ProductResponseDto.from);
+      } catch (error) {
+        this.logger.error(`Cache get failed for ${cacheKey}`, error);
+      }
     }
 
     const data = await this.repo.find({
-      where: { categoryId },
+      where: { categoryId, ...this.buildWhere(searchText, size) },
       relations: RELATIONS,
     });
 
-    try {
-      await this.cache.set(`products:category:${categoryId}`, data);
-    } catch (error) {
-      this.logger.error(
-        `Cache set failed for products:category:${categoryId}`,
-        error,
-      );
+    if (!isFiltered) {
+      try {
+        await this.cache.set(cacheKey, data);
+      } catch (error) {
+        this.logger.error(`Cache set failed for ${cacheKey}`, error);
+      }
     }
 
     return data.map(ProductResponseDto.from);
   }
 
-  async findByBrandId(brandId: string): Promise<ProductResponseDto[]> {
-    try {
-      const cached = await this.cache.get<Product[]>(
-        `products:brand:${brandId}`,
-      );
-      if (cached) return cached.map(ProductResponseDto.from);
-    } catch (error) {
-      this.logger.error(
-        `Cache get failed for products:brand:${brandId}`,
-        error,
-      );
+  async findByBrandId(
+    brandId: string,
+    searchText?: string,
+    size?: number,
+  ): Promise<ProductResponseDto[]> {
+    const isFiltered = Boolean(searchText || size);
+    const cacheKey = `products:brand:${brandId}`;
+
+    if (!isFiltered) {
+      try {
+        const cached = await this.cache.get<Product[]>(cacheKey);
+        if (cached) return cached.map(ProductResponseDto.from);
+      } catch (error) {
+        this.logger.error(`Cache get failed for ${cacheKey}`, error);
+      }
     }
 
     const data = await this.repo.find({
-      where: { brandId },
+      where: { brandId, ...this.buildWhere(searchText, size) },
       relations: RELATIONS,
     });
 
-    try {
-      await this.cache.set(`products:brand:${brandId}`, data);
-    } catch (error) {
-      this.logger.error(
-        `Cache set failed for products:brand:${brandId}`,
-        error,
-      );
+    if (!isFiltered) {
+      try {
+        await this.cache.set(cacheKey, data);
+      } catch (error) {
+        this.logger.error(`Cache set failed for ${cacheKey}`, error);
+      }
     }
 
     return data.map(ProductResponseDto.from);
   }
 
   async create(dto: CreateProductDto): Promise<ProductResponseDto> {
-    const { nibType, inkType, colorCount, stock, isActive, ...productFields } =
+    const { nibType, inkType, size, stock, isActive, ...productFields } =
       dto;
     const product = await this.repo.save(this.repo.create(productFields));
     const detail = await this.detailRepo.save(
@@ -133,7 +152,7 @@ export class ProductService implements IProductService {
         productId: product.id,
         nibType,
         inkType,
-        colorCount,
+        size,
         stock,
         isActive,
       }),
@@ -151,7 +170,7 @@ export class ProductService implements IProductService {
 
   async update(id: string, dto: UpdateProductDto): Promise<ProductResponseDto> {
     const entity = await this.getEntity(id);
-    const { nibType, inkType, colorCount, stock, isActive, ...productFields } =
+    const { nibType, inkType, size, stock, isActive, ...productFields } =
       dto;
 
     const product = await this.repo.save({
@@ -159,7 +178,7 @@ export class ProductService implements IProductService {
       ...productFields,
     });
 
-    const detailChanges = { nibType, inkType, colorCount, stock, isActive };
+    const detailChanges = { nibType, inkType, size, stock, isActive };
     const hasDetailChanges = Object.values(detailChanges).some(
       (value) => value !== undefined,
     );

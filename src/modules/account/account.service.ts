@@ -4,7 +4,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Account } from '../../entities/account.entity';
 import { Profile } from '../../entities/profile.entity';
@@ -30,8 +30,10 @@ export class AccountService implements IAccountService {
   async findAll(
     page = 1,
     perPage = 10,
+    searchText?: string,
   ): Promise<PaginatedResult<AccountResponseDto>> {
     const [data, total] = await this.repo.findAndCount({
+      where: searchText ? { username: ILike(`%${searchText}%`) } : {},
       skip: (page - 1) * perPage,
       take: perPage,
     });

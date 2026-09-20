@@ -9,6 +9,7 @@ export interface ICustomerService {
   findAll(
     page: number,
     perPage: number,
+    searchText?: string,
   ): Promise<PaginatedResult<CustomerResponseDto>>;
   findById(id: string): Promise<CustomerResponseDto>;
   findByEmail(email: string): Promise<CustomerResponseDto>;

@@ -55,6 +55,20 @@ Lỗi (4xx/5xx) **không** đi qua envelope này, trả nguyên format chuẩn c
 Áp dụng cho mọi `GET` danh sách: `?page=1&perPage=10` (mặc định `page=1`, `perPage=10`).
 Response `data`: `{ items: [...], page, perPage, total }`.
 
+## Tìm kiếm theo tên (`searchText`, query param)
+
+Thêm `?searchText=...` vào các endpoint `GET` danh sách bên dưới để lọc theo tên (không phân biệt hoa/thường, khớp một phần — `ILIKE %text%`):
+
+| Module | Field được search |
+|---|---|
+| Products | `name` |
+| Categories | `name` |
+| Brands | `name` |
+| Customers | `name` |
+| Accounts | `username` |
+
+Các module còn lại (Roles, Orders, Order Items, Payments, Addresses) **không** hỗ trợ `searchText` (không có field tên phù hợp để tìm).
+
 ## Phân quyền
 
 - Token hợp lệ nhưng role không đủ → `403 Forbidden`.
@@ -67,7 +81,7 @@ Response `data`: `{ items: [...], page, perPage, total }`.
 
 | Method | Path | Body | Ghi chú |
 |---|---|---|---|
-| GET | `/accounts?page&perPage` | — | danh sách account |
+| GET | `/accounts?page&perPage&searchText` | — | danh sách account (`searchText` lọc theo `username`) |
 | GET | `/accounts/:id` | — | |
 | POST | `/accounts` | `{ username, email, password, roleId? }` | không có `roleId` → gán role `user` mặc định |
 | PATCH | `/accounts/:id` | `{ username, email?, password? }` | |
@@ -95,7 +109,7 @@ Role mặc định `user`/`admin` tự tạo lúc app khởi động (không c�
 
 | Method | Path | Body |
 |---|---|---|
-| GET | `/categories?page&perPage` | public |
+| GET | `/categories?page&perPage&searchText` | public |
 | GET | `/categories/:id` | public |
 | POST | `/categories` | **admin** — `{ name }` |
 | PATCH | `/categories/:id` | **admin** — `{ name? }` |
@@ -107,7 +121,7 @@ Giống Categories.
 
 | Method | Path | Body |
 |---|---|---|
-| GET | `/brands?page&perPage` | public |
+| GET | `/brands?page&perPage&searchText` | public |
 | GET | `/brands/:id` | public |
 | POST | `/brands` | **admin** — `{ name }` (max 100 ký tự) |
 | PATCH | `/brands/:id` | **admin** — `{ name? }` |
@@ -119,13 +133,15 @@ Giống Categories.
 
 | Method | Path | Body |
 |---|---|---|
-| GET | `/products?page&perPage` | public |
-| GET | `/products/category/:categoryId` | public, trả array |
-| GET | `/products/brand/:brandId` | public, trả array |
+| GET | `/products?page&perPage&searchText&size` | public |
+| GET | `/products/category/:categoryId?searchText&size` | public, trả array |
+| GET | `/products/brand/:brandId?searchText&size` | public, trả array |
 | GET | `/products/:id` | public |
 | POST | `/products` | **admin** — xem dưới |
 | PATCH | `/products/:id` | **admin** — các field optional |
 | DELETE | `/products/:id` | **admin** |
+
+`?size=70` lọc theo `detail.size` — số lượng màu trong 1 set/hộp (cùng tên sản phẩm có thể có nhiều loại `size` khác nhau, ví dụ "Copic Sketch Set" bản 70 màu và bản 150 màu là 2 product row riêng). Khi có `searchText` hoặc `size`, endpoint `category/:categoryId` và `brand/:brandId` **bỏ qua cache Redis** (chỉ danh sách không lọc mới được cache).
 
 `CreateProductDto`:
 ```json
@@ -137,13 +153,13 @@ Giống Categories.
   "image": "string",
   "nibType": "string?",
   "inkType": "string?",
-  "colorCount": 1,
+  "size": 70,
   "price": 45000,
   "stock": 100,
   "isActive": true
 }
 ```
-`nibType/inkType/colorCount/stock/isActive` thực chất lưu ở bảng `product_details` riêng, nhưng gộp vào 1 DTO cho tiện.
+`nibType/inkType/size/stock/isActive` thực chất lưu ở bảng `product_details` riêng, nhưng gộp vào 1 DTO cho tiện.
 
 Response (`ProductResponseDto`):
 ```json
@@ -151,7 +167,7 @@ Response (`ProductResponseDto`):
   "id": "uuid", "name": "...", "series": "...", "price": 45000, "image": "...",
   "categoryId": "uuid", "category": { "id": "...", "name": "..." },
   "brandId": "uuid", "brand": { "id": "...", "name": "..." },
-  "detail": { "nibType": "...", "inkType": "...", "colorCount": 1, "stock": 100, "isActive": true, "descriptions": [] },
+  "detail": { "nibType": "...", "inkType": "...", "size": 70, "stock": 100, "isActive": true, "descriptions": [] },
   "createdAt": "..."
 }
 ```
@@ -162,7 +178,7 @@ Dùng để quản lý khách hàng thủ công (customer thật ra được t�
 
 | Method | Path | Body |
 |---|---|---|
-| GET | `/customers?page&perPage` | |
+| GET | `/customers?page&perPage&searchText` | `searchText` lọc theo `name` |
 | GET | `/customers/email/:email` | |
 | GET | `/customers/:id` | |
 | POST | `/customers` | `{ name, email, phone? }` |

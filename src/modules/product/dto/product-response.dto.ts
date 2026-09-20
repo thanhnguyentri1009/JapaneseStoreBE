@@ -13,7 +13,7 @@ class ProductBrandDto {
 class ProductDetailDto {
   @ApiPropertyOptional() nibType: string;
   @ApiPropertyOptional() inkType: string;
-  @ApiPropertyOptional() colorCount: number;
+  @ApiPropertyOptional() size: number;
   @ApiProperty() stock: number;
   @ApiProperty() isActive: boolean;
   @ApiPropertyOptional({ type: [String] }) descriptions: string[];
@@ -73,7 +73,7 @@ export class ProductResponseDto {
       ? {
           nibType: entity.detail.nibType,
           inkType: entity.detail.inkType,
-          colorCount: entity.detail.colorCount,
+          size: entity.detail.size,
           stock: entity.detail.stock,
           isActive: entity.detail.isActive,
           descriptions: entity.detail.descriptions,

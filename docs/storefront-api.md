@@ -45,15 +45,18 @@ Access token sống 3 ngày. Lưu `access_token` ở phía client (memory/localS
 ## 2. Duyệt sản phẩm — public, không cần token
 
 ```
-GET /products?page=1&perPage=20
+GET /products?page=1&perPage=20&searchText=&size=
 GET /products/:id
-GET /products/category/:categoryId     → trả array, không phân trang
-GET /products/brand/:brandId           → trả array, không phân trang
-GET /categories?page&perPage
+GET /products/category/:categoryId?searchText=&size=     → trả array, không phân trang
+GET /products/brand/:brandId?searchText=&size=            → trả array, không phân trang
+GET /categories?page&perPage&searchText
 GET /categories/:id
-GET /brands?page&perPage
+GET /brands?page&perPage&searchText
 GET /brands/:id
 ```
+
+- `searchText`: lọc theo tên (không phân biệt hoa/thường, khớp một phần).
+- `size`: lọc theo `detail.size` — số lượng màu trong 1 set/hộp. Cùng tên sản phẩm có thể tồn tại nhiều `size` khác nhau (ví dụ cùng là "Copic Sketch Set" nhưng có bản 70 màu và bản 150 màu, mỗi bản là 1 product row riêng) — dùng `size` để lọc đúng loại khách muốn xem.
 
 Response 1 product:
 ```json
@@ -62,7 +65,7 @@ Response 1 product:
   "image": "https://...",
   "categoryId": "uuid", "category": { "id": "...", "name": "Marker" },
   "brandId": "uuid", "brand": { "id": "...", "name": "Copic" },
-  "detail": { "nibType": "Brush & Chisel", "inkType": "Alcohol-based", "colorCount": 1, "stock": 42, "isActive": true },
+  "detail": { "nibType": "Brush & Chisel", "inkType": "Alcohol-based", "size": 70, "stock": 42, "isActive": true },
   "createdAt": "..."
 }
 ```
