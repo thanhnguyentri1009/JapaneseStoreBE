@@ -11,7 +11,7 @@ POST /api/auth/login
 { "username": "...", "password": "..." }
 ```
 
-Trả về `{ access_token }` (JSON) + set cookie `refresh_token` (httpOnly). Gửi `access_token` trong header:
+Trả về `{ access_token }` (JSON) + set cookie `refresh_token` (httpOnly). Cookie này dùng `Secure` luôn bật, và `SameSite=None` khi `NODE_ENV=production` (bắt buộc để trình duyệt gửi cookie cross-site khi FE và BE khác domain, ví dụ FE trên Vercel/Netlify, BE trên Render) — dev local (`NODE_ENV` khác `production`, chạy `http`) dùng `SameSite=Lax`. Gửi `access_token` trong header:
 
 ```
 Authorization: Bearer <access_token>
@@ -23,7 +23,15 @@ Refresh token khi access token hết hạn (3 ngày):
 POST /api/auth/refresh   // đọc cookie refresh_token, trả access_token mới
 ```
 
-> Muốn tạo account admin: hiện **chưa có** endpoint đổi role cho account đã tồn tại. Chỉ set được `roleId` lúc `POST /accounts` (tạo mới). Lấy `roleId` của role `admin` qua `GET /roles` (public, không cần token).
+Đăng xuất — cần Bearer token hợp lệ (mọi role, kể cả `admin`):
+
+```
+POST /api/auth/logout
+```
+
+Xoá cookie `refresh_token` phía client **và** vô hiệu hoá refresh token đó trong DB (set `NULL`) — token cũ dùng lại `POST /auth/refresh` sẽ bị `401`. Không có khái niệm "thu hồi tất cả session": mỗi account chỉ lưu 1 refresh token còn hiệu lực tại một thời điểm (login/refresh mới sẽ ghi đè token cũ), nên logout luôn thu hồi toàn bộ phiên đang có của account đó, kể cả cho `admin`.
+
+> Muốn tạo account admin: hiện **chưa có** endpoint đổi role cho account đã tồn tại. Chỉ set được `roleId` lúc `POST /accounts` (tạo mới, **cần role `admin`**). Lấy `roleId` của role `admin` qua `GET /roles` (**cần role `admin`**) — account admin đầu tiên phải được tạo qua `npm run seed` hoặc thao tác DB trực tiếp.
 
 ## Response envelope (áp dụng cho MỌI endpoint thành công)
 
@@ -55,9 +63,7 @@ Response `data`: `{ items: [...], page, perPage, total }`.
 
 ---
 
-## 1. Accounts — `/accounts`
-
-⚠️ **Chưa giới hạn role** — bất kỳ account đã login nào (kể cả `role: user`) đều gọi được các API này. Cần bạn quyết định có khoá lại `admin` only không.
+## 1. Accounts — `/accounts` 🔒 admin-only (toàn bộ)
 
 | Method | Path | Body | Ghi chú |
 |---|---|---|---|
@@ -69,9 +75,9 @@ Response `data`: `{ items: [...], page, perPage, total }`.
 
 Response account (`AccountResponseDto`): `{ id, username, email, role: { id, name } | null }` (không có `password`, `refresh_token`).
 
-## 2. Roles — `/roles`
+Account thường (`role: user`) tự sửa thông tin của chính mình qua `PATCH /profile/me` (mục 12), không qua `/accounts`.
 
-⚠️ **Toàn bộ controller là Public** — không cần token, ai cũng gọi được kể cả tạo/sửa/xoá role. Đây là quyết định có sẵn từ trước (không phải tôi thêm), nêu ra để bạn biết.
+## 2. Roles — `/roles` 🔒 admin-only (toàn bộ)
 
 | Method | Path | Body |
 |---|---|---|
@@ -85,15 +91,15 @@ Role mặc định `user`/`admin` tự tạo lúc app khởi động (không c�
 
 ## 3. Categories — `/categories`
 
-Đọc (`GET`) là **public**. Ghi cần login (JWT — bất kỳ role, chưa khoá `admin` only).
+Đọc (`GET`) là **public**. Ghi (`POST`/`PATCH`/`DELETE`) 🔒 **admin-only**.
 
 | Method | Path | Body |
 |---|---|---|
 | GET | `/categories?page&perPage` | public |
 | GET | `/categories/:id` | public |
-| POST | `/categories` | `{ name }` |
-| PATCH | `/categories/:id` | `{ name? }` |
-| DELETE | `/categories/:id` | — |
+| POST | `/categories` | **admin** — `{ name }` |
+| PATCH | `/categories/:id` | **admin** — `{ name? }` |
+| DELETE | `/categories/:id` | **admin** |
 
 ## 4. Brands — `/brands`
 
@@ -103,13 +109,13 @@ Giống Categories.
 |---|---|---|
 | GET | `/brands?page&perPage` | public |
 | GET | `/brands/:id` | public |
-| POST | `/brands` | `{ name }` (max 100 ký tự) |
-| PATCH | `/brands/:id` | `{ name? }` |
-| DELETE | `/brands/:id` | — |
+| POST | `/brands` | **admin** — `{ name }` (max 100 ký tự) |
+| PATCH | `/brands/:id` | **admin** — `{ name? }` |
+| DELETE | `/brands/:id` | **admin** |
 
 ## 5. Products — `/products`
 
-Đọc là public. Ghi cần login (chưa khoá `admin` only).
+Đọc là public. Ghi (`POST`/`PATCH`/`DELETE`) 🔒 **admin-only**.
 
 | Method | Path | Body |
 |---|---|---|
@@ -117,9 +123,9 @@ Giống Categories.
 | GET | `/products/category/:categoryId` | public, trả array |
 | GET | `/products/brand/:brandId` | public, trả array |
 | GET | `/products/:id` | public |
-| POST | `/products` | xem dưới |
-| PATCH | `/products/:id` | các field optional |
-| DELETE | `/products/:id` | — |
+| POST | `/products` | **admin** — xem dưới |
+| PATCH | `/products/:id` | **admin** — các field optional |
+| DELETE | `/products/:id` | **admin** |
 
 `CreateProductDto`:
 ```json
@@ -150,9 +156,9 @@ Response (`ProductResponseDto`):
 }
 ```
 
-## 6. Customers — `/customers`
+## 6. Customers — `/customers` 🔒 admin-only (toàn bộ)
 
-Cần login, không khoá role. Dùng để quản lý khách hàng thủ công (customer thật ra được tạo tự động khi khách checkout — xem file storefront).
+Dùng để quản lý khách hàng thủ công (customer thật ra được tạo tự động khi khách checkout — xem file storefront).
 
 | Method | Path | Body |
 |---|---|---|
@@ -167,16 +173,16 @@ Response có thêm `accountId` (null nếu khách chưa từng đăng nhập khi
 
 ## 7. Addresses — `/addresses`
 
-Cần login, **chưa có ownership check** (ai login cũng sửa/xoá được address của customer bất kỳ nếu biết ID — biết để cẩn trọng khi build UI).
+Cần login. `PATCH`/`DELETE` giờ có **ownership check**: `admin` sửa/xoá address bất kỳ; account `role: user` chỉ sửa/xoá được address thuộc `customer` gắn với chính account đó (`customer.accountId === request.user.sub`) — sai chủ sẽ trả `403 Forbidden`. `GET`/`POST` vẫn mở cho mọi role đã login (không đổi).
 
-| Method | Path | Body |
-|---|---|---|
-| GET | `/addresses?page&perPage` | |
-| GET | `/addresses/customer/:customerId` | |
-| GET | `/addresses/:id` | |
-| POST | `/addresses` | `{ customerId, address, city?, country?, isDefault? }` |
-| PATCH | `/addresses/:id` | optional fields |
-| DELETE | `/addresses/:id` | |
+| Method | Path | Body | Role |
+|---|---|---|---|
+| GET | `/addresses?page&perPage` | | mọi role |
+| GET | `/addresses/customer/:customerId` | | mọi role |
+| GET | `/addresses/:id` | | mọi role |
+| POST | `/addresses` | `{ customerId, address, city?, country?, isDefault? }` | mọi role |
+| PATCH | `/addresses/:id` | optional fields | **admin**, hoặc **owner** của address |
+| DELETE | `/addresses/:id` | | **admin**, hoặc **owner** của address |
 
 ## 8. Orders — `/orders` 🔒 admin-only cho ghi
 

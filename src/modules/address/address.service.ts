@@ -1,7 +1,13 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Address } from '../../entities/address.entity';
+import { Customer } from '../../entities/customer.entity';
 import { IAddressService } from './interfaces/address-service.interface';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -16,6 +22,8 @@ export class AddressService implements IAddressService {
     @Inject(CACHE_MANAGER) private cache: Cache,
     @InjectRepository(Address)
     private readonly repo: Repository<Address>,
+    @InjectRepository(Customer)
+    private readonly customerRepo: Repository<Customer>,
   ) {}
 
   async findAll(
@@ -57,6 +65,42 @@ export class AddressService implements IAddressService {
 
   async remove(id: string): Promise<void> {
     const entity = await this.getEntity(id);
+    await this.repo.remove(entity);
+  }
+
+  private async resolveOwnCustomerId(
+    accountId: string,
+  ): Promise<string | null> {
+    const customer = await this.customerRepo.findOne({
+      where: { accountId },
+    });
+    return customer?.id ?? null;
+  }
+
+  private async assertOwnership(
+    entity: Address,
+    accountId: string,
+  ): Promise<void> {
+    const customerId = await this.resolveOwnCustomerId(accountId);
+    if (!customerId || entity.customerId !== customerId) {
+      throw new ForbiddenException('You do not have access to this address');
+    }
+  }
+
+  async updateForAccount(
+    id: string,
+    dto: UpdateAddressDto,
+    accountId: string,
+  ): Promise<AddressResponseDto> {
+    const entity = await this.getEntity(id);
+    await this.assertOwnership(entity, accountId);
+    const result = await this.repo.save({ ...entity, ...dto });
+    return AddressResponseDto.from(result);
+  }
+
+  async removeForAccount(id: string, accountId: string): Promise<void> {
+    const entity = await this.getEntity(id);
+    await this.assertOwnership(entity, accountId);
     await this.repo.remove(entity);
   }
 }

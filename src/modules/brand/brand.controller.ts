@@ -18,6 +18,7 @@ import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
 @Controller('brands')
@@ -36,16 +37,19 @@ export class BrandController {
     return this.service.findById(id);
   }
 
+  @Roles('admin')
   @Post()
   create(@Body() dto: CreateBrandDto) {
     return this.service.create(dto);
   }
 
+  @Roles('admin')
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateBrandDto) {
     return this.service.update(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(id);

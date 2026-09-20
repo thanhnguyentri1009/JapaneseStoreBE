@@ -20,8 +20,10 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
+@Roles('admin')
 @Controller('accounts')
 export class AccountController {
   constructor(

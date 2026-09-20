@@ -17,8 +17,10 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
+@Roles('admin')
 @Controller('customers')
 export class CustomerController {
   constructor(

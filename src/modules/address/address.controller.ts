@@ -8,6 +8,7 @@ import {
   Body,
   Inject,
   Query,
+  Req,
 } from '@nestjs/common';
 import {
   ADDRESS_SERVICE,
@@ -47,12 +48,20 @@ export class AddressController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateAddressDto) {
-    return this.service.update(id, dto);
+  update(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    @Req() req: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateAddressDto,
+  ) {
+    if (req.user.role === 'admin') return this.service.update(id, dto);
+    return this.service.updateForAccount(id, dto, req.user.sub);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.service.remove(id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  remove(@Req() req: any, @Param('id') id: string) {
+    if (req.user.role === 'admin') return this.service.remove(id);
+    return this.service.removeForAccount(id, req.user.sub);
   }
 }

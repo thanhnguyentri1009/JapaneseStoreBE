@@ -13,4 +13,5 @@ export interface IAuthService {
   register(dto: CreateAccountDto): Promise<AccountResponseDto>;
   login(dto: LoginDto): Promise<TokenPair>;
   refresh(refreshToken: string): Promise<TokenPair>;
+  logout(refreshToken: string): Promise<void>;
 }

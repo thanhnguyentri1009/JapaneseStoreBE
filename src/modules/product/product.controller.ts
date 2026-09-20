@@ -18,6 +18,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiBearerAuth()
 @Controller('products')
@@ -51,16 +52,19 @@ export class ProductController {
     return this.service.findById(id);
   }
 
+  @Roles('admin')
   @Post()
   create(@Body() dto: CreateProductDto) {
     return this.service.create(dto);
   }
 
+  @Roles('admin')
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateProductDto) {
     return this.service.update(id, dto);
   }
 
+  @Roles('admin')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.service.remove(id);

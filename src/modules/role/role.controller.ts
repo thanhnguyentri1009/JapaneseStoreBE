@@ -9,12 +9,14 @@ import {
   Query,
 } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { Public } from '../../common/decorators/public.decorator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
 
-@Public()
+@ApiBearerAuth()
+@Roles('admin')
 @Controller('roles')
 export class RoleController {
   constructor(private readonly service: RoleService) {}

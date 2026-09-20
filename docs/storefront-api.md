@@ -37,7 +37,7 @@ POST /auth/refresh          // không cần Bearer, dùng cookie refresh_token
 
 ```
 POST /auth/logout           // cần Bearer token
-→ xoá cookie refresh_token
+→ xoá cookie refresh_token, đồng thời vô hiệu hoá refresh_token đó trong DB
 ```
 
 Access token sống 3 ngày. Lưu `access_token` ở phía client (memory/localStorage), **không tự set cookie access token** — server không đọc cookie cho access token.
@@ -157,7 +157,7 @@ PATCH /addresses/:id     { address?, city?, country?, isDefault? }
 DELETE /addresses/:id
 ```
 
-⚠️ **Chưa có kiểm tra ownership ở đây** (khác với `/checkout`, nơi đã kiểm tra) — về mặt kỹ thuật một user đăng nhập vẫn có thể sửa/xoá address của `customerId` khác nếu biết ID. Cẩn trọng khi build UI (chỉ hiển thị/thao tác trên địa chỉ mà chính app tạo/biết), và nên báo lại nếu cần khoá chặt hơn.
+`PATCH`/`DELETE` giờ có kiểm tra ownership: chỉ sửa/xoá được address thuộc `customer` gắn với account đang đăng nhập (`customer.accountId === token.sub`) — gọi vào address của người khác trả `403 Forbidden`. `GET`/`POST` vẫn không kiểm tra ownership (giữ nguyên như trước).
 
 ## 7. Lấy `customerId` của tôi để dùng cho `/addresses`
 

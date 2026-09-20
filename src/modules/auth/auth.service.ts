@@ -106,4 +106,14 @@ export class AuthService implements IAuthService {
 
     return tokens;
   }
+
+  async logout(refreshToken: string): Promise<void> {
+    const entity = await this.repo.findOne({
+      where: { refresh_token: refreshToken },
+    });
+    if (!entity) return;
+
+    await this.repo.save({ ...entity, refresh_token: null });
+    this.logger.log(`Account "${entity.username}" logged out`);
+  }
 }

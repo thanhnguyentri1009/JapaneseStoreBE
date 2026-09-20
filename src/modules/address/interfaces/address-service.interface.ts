@@ -15,4 +15,10 @@ export interface IAddressService {
   create(dto: CreateAddressDto): Promise<AddressResponseDto>;
   update(id: string, dto: UpdateAddressDto): Promise<AddressResponseDto>;
   remove(id: string): Promise<void>;
+  updateForAccount(
+    id: string,
+    dto: UpdateAddressDto,
+    accountId: string,
+  ): Promise<AddressResponseDto>;
+  removeForAccount(id: string, accountId: string): Promise<void>;
 }
