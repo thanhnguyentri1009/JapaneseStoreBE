@@ -17,4 +17,4 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "npm run migration:run:prod && node dist/main"]
