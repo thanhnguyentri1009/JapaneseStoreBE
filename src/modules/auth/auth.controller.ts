@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
 import { Public } from '../../common/decorators/public.decorator';
 import {
   AUTH_SERVICE,
@@ -20,33 +19,28 @@ import { CreateAccountDto } from '../account/dto/create-account.dto';
 
 const REFRESH_COOKIE = 'refresh_token';
 
-// FE và BE deploy khác domain (Vercel/Netlify <-> Render) → cookie phải
-// SameSite=None; Secure để trình duyệt còn gửi kèm cross-site. Dev local
-// (http, cùng-site) thì vẫn dùng Lax vì Secure cookie không set được qua http.
-function buildCookieOptions(isProd: boolean) {
-  return {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
-    maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-    path: '/',
-  };
-}
+// FE và BE luôn khác domain/port với nhau (kể cả dev: localhost:5173 <->
+// localhost:3000, hoặc localhost <-> onrender.com) → mọi request đều là
+// cross-site nên cookie luôn cần SameSite=None; Secure để trình duyệt gửi
+// kèm. Chrome/Firefox coi http://localhost là secure context nên vẫn set
+// được cookie Secure qua http khi dev chạy trên localhost.
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none' as const,
+  maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+  path: '/',
+};
 
 @ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
-  private readonly cookieOptions: ReturnType<typeof buildCookieOptions>;
+  private readonly cookieOptions = COOKIE_OPTIONS;
 
   constructor(
     @Inject(AUTH_SERVICE)
     private readonly service: IAuthService,
-    config: ConfigService,
-  ) {
-    this.cookieOptions = buildCookieOptions(
-      config.get('NODE_ENV') === 'production',
-    );
-  }
+  ) {}
 
   @Public()
   @Post('register')
