@@ -152,6 +152,8 @@ async function seed() {
       profileRepo.create({
         account: acc,
         fullName: accountData[i].fullName,
+        username: accountData[i].username,
+        email: accountData[i].email,
         phone: accountData[i].phone,
         address: null,
         img: null,
@@ -789,6 +791,130 @@ async function seed() {
     },
   ]);
   console.log('Seeded payments');
+
+  // ===== STATISTICS DATA =====
+  // Historical orders spread over the last 6 months (incl. current month) so
+  // the dashboard and top-selling-products APIs have meaningful data.
+  // Deterministic PRNG keeps the seed reproducible.
+  let rngState = 20260926;
+  const rand = () => {
+    rngState = (rngState * 1664525 + 1013904223) % 4294967296;
+    return rngState / 4294967296;
+  };
+  const randInt = (min: number, max: number) =>
+    min + Math.floor(rand() * (max - min + 1));
+
+  // Higher weight = sold more often, so the ranking has a clear top list
+  const productWeights = [9, 7, 10, 5, 6, 3, 2, 8, 4, 3, 5, 2];
+  const totalWeight = productWeights.reduce((a, b) => a + b, 0);
+  const pickProduct = () => {
+    let r = rand() * totalWeight;
+    for (let i = 0; i < productWeights.length; i++) {
+      r -= productWeights[i];
+      if (r < 0) return products[i];
+    }
+    return products[products.length - 1];
+  };
+
+  const methods = [
+    PaymentMethod.COD,
+    PaymentMethod.BANK_TRANSFER,
+    PaymentMethod.MOMO,
+    PaymentMethod.VNPAY,
+  ];
+  const customerCount = Math.min(customers.length, addresses.length);
+  const now = new Date();
+
+  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
+    const monthStart = new Date(
+      now.getFullYear(),
+      now.getMonth() - monthsAgo,
+      1,
+    );
+    const lastDay =
+      monthsAgo === 0
+        ? now.getDate()
+        : new Date(
+            monthStart.getFullYear(),
+            monthStart.getMonth() + 1,
+            0,
+          ).getDate();
+    const orderCount = randInt(15, 25);
+
+    for (let n = 0; n < orderCount; n++) {
+      const orderedAt = new Date(
+        monthStart.getFullYear(),
+        monthStart.getMonth(),
+        randInt(1, lastDay),
+        randInt(8, 21),
+        randInt(0, 59),
+      );
+
+      // Distinct products per order, 1-3 line items, quantity 1-4
+      const lineItems = new Map<Product, number>();
+      const itemCount = randInt(1, 3);
+      while (lineItems.size < itemCount) {
+        lineItems.set(pickProduct(), randInt(1, 4));
+      }
+      const totalAmount = [...lineItems].reduce(
+        (sum, [p, qty]) => sum + Number(p.price) * qty,
+        0,
+      );
+
+      // Older months are mostly delivered; recent orders are still in flight
+      const r = rand();
+      let status: OrderStatus;
+      if (r < 0.1) status = OrderStatus.CANCELLED;
+      else if (monthsAgo >= 1) status = OrderStatus.DELIVERED;
+      else if (r < 0.4) status = OrderStatus.DELIVERED;
+      else if (r < 0.6) status = OrderStatus.SHIPPING;
+      else if (r < 0.8) status = OrderStatus.CONFIRMED;
+      else status = OrderStatus.PENDING;
+
+      const c = randInt(0, customerCount - 1);
+      const order = await orderRepo.save(
+        orderRepo.create({
+          customer: customers[c],
+          address: addresses[c],
+          status,
+          totalAmount,
+          orderedAt,
+        }),
+      );
+
+      await orderItemRepo.save(
+        [...lineItems].map(([product, quantity]) =>
+          orderItemRepo.create({
+            order,
+            product,
+            quantity,
+            unitPrice: Number(product.price),
+          }),
+        ),
+      );
+
+      const method = methods[randInt(0, methods.length - 1)];
+      const paid =
+        status === OrderStatus.DELIVERED ||
+        (status !== OrderStatus.CANCELLED &&
+          status !== OrderStatus.PENDING &&
+          method !== PaymentMethod.COD);
+      await paymentRepo.save(
+        paymentRepo.create({
+          order,
+          method,
+          status: paid
+            ? PaymentStatus.PAID
+            : status === OrderStatus.CANCELLED
+              ? PaymentStatus.FAILED
+              : PaymentStatus.PENDING,
+          amount: totalAmount,
+          paidAt: paid ? orderedAt : null,
+        }),
+      );
+    }
+  }
+  console.log('Seeded statistics orders (last 6 months)');
 
   await AppDataSource.destroy();
   console.log('Done! Database seeded successfully.');
