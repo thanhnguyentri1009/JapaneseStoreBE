@@ -22,6 +22,8 @@ import { BrandModule } from './modules/brand/brand.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { CheckoutModule } from './modules/checkout/checkout.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { StatisticModule } from './modules/statistic/statistic.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 
@@ -76,6 +78,8 @@ import { redisStore } from 'cache-manager-redis-yet';
     ProfileModule,
     StorageModule,
     CheckoutModule,
+    DashboardModule,
+    StatisticModule,
     JwtModule.register({}),
   ],
   providers: [
